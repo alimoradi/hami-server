@@ -71,7 +71,7 @@ services:
     restart: unless-stopped
     tty: true
     ports:
-      - "6060:18080"
+      - "6060:6064"
     environment: 
       EXT_CONFIG: ./conf/tinode.conf
     volumes:
