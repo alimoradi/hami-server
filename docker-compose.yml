@@ -64,7 +64,20 @@ services:
     
     networks:
       - app-network
-
+  #tinode Service
+  tinode:
+    image: tinode/tinode-mysql:latest
+    container_name: tinode
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "6060:18080"
+    environment: 
+      EXT_CONFIG=./conf/tinode.conf
+    volumes:
+      - /var/www/hami-server/tinode/:/opt/tinode/conf
+    networks:
+      - app-network
 #Docker Networks
 networks:
   app-network:
