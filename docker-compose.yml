@@ -28,7 +28,6 @@ services:
     tty: true
     ports:
       - "80:80"
-      - "8080:8080"
       - "443:443"
     volumes:
       - /var/www:/var/www
@@ -52,6 +51,17 @@ services:
     volumes:
       - dbdata:/var/lib/mysql/
       - ./mysql/my.cnf:/etc/mysql/my.cnf
+    networks:
+      - app-network
+  #PhpMyAdmin Service
+  db:
+    image: phpmyadmin/phpmyadmin
+    container_name: pma
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "8080:80"
+    
     networks:
       - app-network
 
