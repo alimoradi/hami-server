@@ -73,7 +73,7 @@ services:
     ports:
       - "6060:18080"
     environment: 
-      EXT_CONFIG=./conf/tinode.conf
+      EXT_CONFIG:./conf/tinode.conf
     volumes:
       - /var/www/hami-server/tinode/:/opt/tinode/conf
     networks:
