@@ -54,7 +54,7 @@ services:
     networks:
       - app-network
   #PhpMyAdmin Service
-  db:
+  pma:
     image: phpmyadmin/phpmyadmin
     container_name: pma
     restart: unless-stopped
