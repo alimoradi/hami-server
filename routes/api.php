@@ -16,7 +16,7 @@ use Illuminate\Http\Request;
 
 Route::apiResource('test', 'SampleResourceApiController');
 
-Route::middleware(\App\Http\Middleware\Cors::class)->group(function () {
+
     Route::namespace('Api')->group(function () {
         Route::namespace('Auth')->group(function () {
             Route::post('login', 'AuthController@login');
@@ -39,7 +39,7 @@ Route::middleware(\App\Http\Middleware\Cors::class)->group(function () {
             Route::post('upd', 'TinodeRestAuthenticatorController@update');
             Route::post('rtagns', 'TinodeRestAuthenticatorController@restrictedTagNamespaces');
         });
-    });
+
 });
 
 
