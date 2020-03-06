@@ -25,7 +25,13 @@ class AuthController extends Controller
     public function register(AccountVerifier $verifier, Request $request)
     {
 
-        $request->validate(['phone'=> 'required|unique:users', 'password' => 'required', 'first_name' => 'required', 'last_name' => 'required']);
+        $request->validate(['phone'=> 'required|unique:users'
+            , 'password' => 'required'
+            , 'first_name' => 'required'
+            , 'last_name' => 'required'
+            , 'tinode_username' => 'required'
+            , 'tinode_pass' => 'required'
+            , 'tinode_uid' => 'required']);
         $user = new User;
         $user->first_name=$request->input('first_name');
         $user->last_name=$request->input('last_name');
@@ -34,6 +40,9 @@ class AuthController extends Controller
         $user->verification_code = $this->accountVerifier->generateVerificationCode();
         if($this->accountVerifier->sendVerificationCode($user->verification_code))
         {
+            $user->tinode_username = $request->input('tinode_username');
+            $user->tinode_pass = $request->input('tinode_pass');
+            $user->tinode_uid = $request->input('tinode_uid');
             $user->role_id = $this->accessManager->getRoleId('service_user');
             $user->save();
             return response()->json(['success' => true]);
@@ -42,6 +51,7 @@ class AuthController extends Controller
 
 
     }
+    
     public function verify(Request $request)
     {
 

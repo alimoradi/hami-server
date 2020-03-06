@@ -7,7 +7,8 @@ class SmsAccountVerification implements AccountVerifier
 {
     public function generateVerificationCode()
     {
-        return rand(1000,9999);
+        return 1234;
+        //return rand(1000,9999);
     }
     public function sendVerificationCode($verificationCode)
     {

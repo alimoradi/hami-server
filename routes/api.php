@@ -19,6 +19,7 @@ Route::namespace('Api')->group(function(){
         Route::post('login', 'AuthController@login');
         Route::post('register', 'AuthController@register');
         Route::post('verify', 'AuthController@verify');
+        Route::post('postRegisterVerify', 'AuthController@postRegisterVerify');
     });
     Route::resource('categories', 'ProviderCategoriesController');
     Route::prefix('providers')->group(function(){
