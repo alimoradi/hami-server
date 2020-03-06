@@ -13,33 +13,33 @@ use Illuminate\Http\Request;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
 Route::apiResource('test', 'SampleResourceApiController');
 
-Route::middleware(\App\Http\Middleware\Cors::class)->group(function(){
-Route::namespace('Api')->group(function(){
-    Route::namespace('Auth')->group(function(){
-        Route::post('login', 'AuthController@login');
-        Route::post('register', 'AuthController@register');
-        Route::post('verify', 'AuthController@verify');
-        Route::post('postRegisterVerify', 'AuthController@postRegisterVerify');
+Route::middleware(\App\Http\Middleware\Cors::class)->group(function () {
+    Route::namespace('Api')->group(function () {
+        Route::namespace('Auth')->group(function () {
+            Route::post('login', 'AuthController@login');
+            Route::post('register', 'AuthController@register');
+            Route::post('verify', 'AuthController@verify');
+            Route::post('postRegisterVerify', 'AuthController@postRegisterVerify');
+        });
+        Route::resource('categories', 'ProviderCategoriesController');
+        Route::prefix('providers')->group(function () {
+            Route::get('getByCategoryId/{categoryId}', 'ProvidersController@getByCategoryId');
+            Route::get('getByUid/{uid}', 'ProvidersController@getByUid');
+        });
+        Route::prefix('tinodeAuthenticator')->group(function () {
+            Route::post('add', 'TinodeRestAuthenticatorController@add');
+            Route::post('auth', 'TinodeRestAuthenticatorController@auth');
+            Route::post('checkunique', 'TinodeRestAuthenticatorController@checkUnique');
+            Route::post('del', 'TinodeRestAuthenticatorController@delete');
+            Route::post('gen', 'TinodeRestAuthenticatorController@generate');
+            Route::post('link', 'TinodeRestAuthenticatorController@link');
+            Route::post('upd', 'TinodeRestAuthenticatorController@update');
+            Route::post('rtagns', 'TinodeRestAuthenticatorController@restrictedTagNamespaces');
+        });
     });
-    Route::resource('categories', 'ProviderCategoriesController');
-    Route::prefix('providers')->group(function(){
-        Route::get('getByCategoryId/{categoryId}', 'ProvidersController@getByCategoryId');
-        Route::get('getByUid/{uid}', 'ProvidersController@getByUid');
-    });
-    Route::prefix('tinodeAuthenticator')->group(function(){
-        Route::post('add','TinodeRestAuthenticatorController@add');
-        Route::post('auth','TinodeRestAuthenticatorController@auth');
-        Route::post('checkunique','TinodeRestAuthenticatorController@checkUnique');
-        Route::post('del','TinodeRestAuthenticatorController@delete');
-        Route::post('gen','TinodeRestAuthenticatorController@generate');
-        Route::post('link','TinodeRestAuthenticatorController@link');
-        Route::post('upd','TinodeRestAuthenticatorController@update');
-        Route::post('rtagns','TinodeRestAuthenticatorController@restrictedTagNamespaces');
-    });
-});
-
 });
 
 
