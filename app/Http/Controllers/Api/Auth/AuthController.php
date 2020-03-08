@@ -71,11 +71,12 @@ class AuthController extends Controller
 
 
         $credentials = $request->only('username', 'password');
-
+        
         if(auth()->attempt(['phone' => $credentials['username'], 'password' => $credentials['password']]))
         {
+            
             $user = User::where('phone', $credentials['username'])->first();
-
+           
             $role = $user->checkRole();
             $scopes = '';
             // grant scopes based on the role that we get previously
@@ -88,7 +89,7 @@ class AuthController extends Controller
                 $scopes = config('scopes.admin');
             }
             $request->request->add([
-                    'scope' => implode($scopes, ' ')
+                    'scope' => implode(' ', $scopes)
                 ]);
             // forward the request to the oauth token request endpoint
             $tokenRequest = Request::create(

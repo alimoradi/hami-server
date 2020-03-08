@@ -38,7 +38,7 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
         Passport::routes();
         Gate::define('see-user', function ($user) {
-            return $user->id == 2;
+            return $user->id == auth()->user()->id;
         });
         Passport::tokensCan(
             config("scopes.all")

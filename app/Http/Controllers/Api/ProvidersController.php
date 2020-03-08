@@ -18,7 +18,7 @@ class ProvidersController extends Controller
     public function getByUid($uid)
     {
         return Provider::with(['user'])->whereHas('user', function ($query) use($uid) {
-            $query->where('uid', '=', $uid);
+            $query->where('tinode_uid', '=', $uid);
         })->first();
     }
 }
