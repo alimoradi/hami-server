@@ -70,13 +70,17 @@ class AuthController extends Controller
     {
 
 
-        $credentials = $request->only('username', 'password');
+        $credentials = $request->only('username', 'password', 'role_id');
         
         if(auth()->attempt(['phone' => $credentials['username'], 'password' => $credentials['password']]))
         {
             
             $user = User::where('phone', $credentials['username'])->first();
-           
+            if($credentials['role_id'] != $user->role_id)
+            {
+                return response()->json(['error' => 'invalid_role_id', 'error_message' => 'The provided role id is invalid.',
+                                    'error_description' => 'The provided role id invalid.'],403);
+            }
             $role = $user->checkRole();
             $scopes = '';
             // grant scopes based on the role that we get previously
@@ -100,7 +104,7 @@ class AuthController extends Controller
             return Route::dispatch($tokenRequest);
         }
         return response()->json(['error' => 'invalid_credentials', 'error_message' => 'The provided credentials are invalid.',
-                                    'error_description' => 'The provided credentials are invalid.']);
+                                    'error_description' => 'The provided credentials are invalid.'], 403);
 
 
         // implement your user role retrieval logic, for example retrieve from `roles` database table

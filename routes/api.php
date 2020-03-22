@@ -28,6 +28,22 @@ Route::namespace('Api')->group(function () {
     Route::prefix('providers')->group(function () {
         Route::get('getByCategoryId/{categoryId}', 'ProvidersController@getByCategoryId');
         Route::get('getByUid/{uid}', 'ProvidersController@getByUid');
+        Route::middleware('auth:api')->group(function(){
+            Route::post('addFavorite/{providerId}', 'FavoriteProvidersController@add');
+            Route::post('deleteFavorite/{providerId}', 'FavoriteProvidersController@delete');
+            Route::get('favorites', 'FavoriteProvidersController@index');
+        });
+    });
+    Route::prefix('sessions')->group(function () {
+        
+        Route::middleware('auth:api')->group(function(){
+            Route::post('request/{providerId}/{chatTopicName}', 'SessionsController@request');
+            Route::post('start/{sessionId}', 'SessionsController@start');
+            Route::post('end/{sessionId}', 'SessionsController@end');
+            Route::get('userActiveSessions', 'SessionsController@userActiveSessions');
+            Route::get('userEndedSessions', 'SessionsController@userEndedSessions');
+            Route::get('userRequestedSessions', 'SessionsController@userRequestedSessions');
+        });
     });
     Route::prefix('tinodeAuthenticator')->group(function () {
         Route::post('add', 'TinodeRestAuthenticatorController@add');
