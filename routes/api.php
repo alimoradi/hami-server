@@ -35,6 +35,12 @@ Route::namespace('Api')->group(function () {
             Route::get('favorites', 'FavoriteProvidersController@index');
         });
     });
+    Route::prefix('users')->group(function () {
+        
+        Route::middleware('auth:api')->group(function(){
+            Route::get('getById/{id}', 'UsersController@getById');
+        });
+    });
     Route::prefix('sessions')->group(function () {
         
         Route::middleware('auth:api')->group(function(){
