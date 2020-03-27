@@ -13,4 +13,10 @@ class ProviderCategoriesController extends Controller
         //var_dump(ProviderCategory::get());
         return json_encode(ProviderCategory::get(), JSON_UNESCAPED_UNICODE);
     }
+    public function show($id)
+    {
+        //var_dump(ProviderCategory::get());
+        return ProviderCategory::where('id', $id)->first();
+        
+    }
 }

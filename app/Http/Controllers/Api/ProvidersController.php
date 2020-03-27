@@ -21,4 +21,8 @@ class ProvidersController extends Controller
             $query->where('tinode_uid', '=', $uid);
         })->first();
     }
+    public function getById($id)
+    {
+        return Provider::with(['user'])->where('id', $id)->first();
+    }
 }
