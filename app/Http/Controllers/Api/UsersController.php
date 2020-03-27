@@ -12,4 +12,8 @@ class UsersController extends Controller
     {
         return User::where('id', $id)->first();
     }
+    public function getByUid($uid)
+    {
+        return User::where('tinode_uid', $uid)->first();
+    }
 }

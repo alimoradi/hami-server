@@ -39,6 +39,7 @@ Route::namespace('Api')->group(function () {
         
         Route::middleware('auth:api')->group(function(){
             Route::get('getById/{id}', 'UsersController@getById');
+            Route::get('getByUid/{uid}', 'UsersController@getByUid');
         });
     });
     Route::prefix('sessions')->group(function () {
