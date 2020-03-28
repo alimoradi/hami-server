@@ -42,6 +42,13 @@ Route::namespace('Api')->group(function () {
             Route::get('getByUid/{uid}', 'UsersController@getByUid');
         });
     });
+    Route::prefix('files')->group(function () {
+        
+        Route::middleware('auth:api')->group(function(){
+            Route::post('uploadMessageFile', 'FileController@uploadMessageFile');
+            Route::get('downloadMessageFile/{name}', 'FileController@downloadMessageFile');
+        });
+    });
     Route::prefix('sessions')->group(function () {
         
         Route::middleware('auth:api')->group(function(){
