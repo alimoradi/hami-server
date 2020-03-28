@@ -40,7 +40,15 @@ class SessionsController extends Controller
     }
     public function providerActiveSessions()
     {
-
+        
+        return Session::with(['provider','provider.user', 'user', 'provider.providerCategory'])
+        ->whereHas('provider.user' , function($query){
+                $query->where('id', '=', auth()->user()->id);
+        })
+        ->where('started', '!=' , null)
+        ->where('ended', null)
+        ->orderBy('started', 'DESC')
+        ->get();
     }
     public function userActiveSessions()
     {
@@ -51,6 +59,17 @@ class SessionsController extends Controller
             ->orderBy('started', 'DESC')
             ->get();
     }
+    public function providerEndedSessions()
+    {
+        
+        return Session::with(['provider','provider.user', 'user', 'provider.providerCategory'])
+        ->whereHas('provider.user' , function($query){
+            $query->where('id', '=', auth()->user()->id);
+        })
+        ->where('ended', '!=' , null)
+        ->orderBy('started', 'DESC')
+        ->get();
+    }
     public function userEndedSessions()
     {
         return Session::with(['provider','provider.user', 'user', 'provider.providerCategory'])
@@ -58,6 +77,20 @@ class SessionsController extends Controller
             ->where('ended', '!=' , null)
             ->orderBy('started', 'DESC')
             ->get();
+    }
+    public function providerRequestedSessions()
+    {
+        
+        return Session::with(['provider','provider.user', 'user', 'provider.providerCategory'])
+        ->whereHas('provider' , function($query){
+            $query->whereHas('user', function($query){
+                $query->where('id', '=', auth()->user()->id);
+            });
+               
+        })
+        ->where('started' , null)
+        ->orderBy('started', 'DESC')
+        ->get();
     }
     public function userRequestedSessions()
     {

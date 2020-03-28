@@ -51,6 +51,9 @@ Route::namespace('Api')->group(function () {
             Route::get('userActiveSessions', 'SessionsController@userActiveSessions');
             Route::get('userEndedSessions', 'SessionsController@userEndedSessions');
             Route::get('userRequestedSessions', 'SessionsController@userRequestedSessions');
+            Route::get('providerActiveSessions', 'SessionsController@providerActiveSessions');
+            Route::get('providerEndedSessions', 'SessionsController@providerEndedSessions');
+            Route::get('providerRequestedSessions', 'SessionsController@providerRequestedSessions');
         });
     });
     Route::prefix('tinodeAuthenticator')->group(function () {
