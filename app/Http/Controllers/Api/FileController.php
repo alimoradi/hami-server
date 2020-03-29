@@ -10,7 +10,7 @@ class FileController extends Controller
 {
     public function uploadMessageFile(Request $request)
     {
-        set_time_limit(300);
+        
         $mimeTypes = [
             "image/jpeg",
             "image/gif",
