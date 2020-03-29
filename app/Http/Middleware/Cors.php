@@ -19,7 +19,7 @@ class CORS
     public function handle($request, Closure $next)
     {
         $value = $next($request);
-        if(method_exists($next($request), 'header' ))
+        if(method_exists($next($request), 'header' ) && $request->expectsJson())
         {
             $value = $next($request)
             ->header('Access-Control-Allow-Origin', '*')
