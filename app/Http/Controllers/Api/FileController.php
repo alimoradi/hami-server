@@ -18,7 +18,7 @@ class FileController extends Controller
             "image/svg+xml"
           ];
         $size = $request->file('file')->getsize();
-        if($size > 50000)
+        if($size > 5000000)
         {
             abort(413, "File too large");
         }
@@ -33,11 +33,7 @@ class FileController extends Controller
         $directory = 'message_files/user_'.auth()->user()->id;
         $name = uniqid().'.'.$extension;
         Storage::putFileAs($directory,$request->file('file'),$name);
-        return response('', 200, [
-            'Access-Control-Allow-Origin'=> '*',
-            'Access-Control-Allow-Headers'=> 'Content-Type, X-Auth-Token, Origin, Content-Type,Authorization',
-            'Access-Control-Allow-Methods'=> 'GET, POST, PUT, DELETE, OPTIONS'
-        ])->json(['name' => $name,
+        return response()->json(['name' => $name,
                 'width' => $width,
                 'height' => $height,
                 'mime_type' => $mime,
