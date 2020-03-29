@@ -45,6 +45,14 @@ class FileController extends Controller
     public function downloadMessageFile($name)
     {
         $directory = 'message_files/user_'.auth()->user()->id. '/';
-        return Storage::download($directory.$name);
+        
+        
+        return response()->download(Storage::path($directory) .$name,null,
+        [
+            'Access-Control-Allow-Origin'=> '*',
+            'Access-Control-Allow-Headers'=> 'Content-Type, X-Auth-Token, Origin, Content-Type,Authorization',
+            'Access-Control-Allow-Methods'=> 'GET, POST, PUT, DELETE, OPTIONS'
+        ]
+        );
     }
 }
