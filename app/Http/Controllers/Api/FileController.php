@@ -39,7 +39,11 @@ class FileController extends Controller
                 'mime_type' => $mime,
                 'size' => $size,
                 'extension' => $extension
-        ]);
+    ],200,[
+        'Access-Control-Allow-Origin'=> '*',
+        'Access-Control-Allow-Headers'=> 'Content-Type, X-Auth-Token, Origin, Content-Type,Authorization',
+        'Access-Control-Allow-Methods'=> 'GET, POST, PUT, DELETE, OPTIONS'
+    ]);
         
     }
     public function downloadMessageFile($name)
