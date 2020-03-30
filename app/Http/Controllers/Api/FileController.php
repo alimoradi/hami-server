@@ -31,8 +31,8 @@ class FileController extends Controller
         $extension = $request->file('file')->extension();
         $width = getimagesize($request->file('file'))[0];
         $height = getimagesize($request->file('file'))[1];
-        $directory = 'message_files/user_'.auth()->user()->id;
-        $name = uniqid().'.'.$extension;
+        $directory = 'message_files';
+        $name = uniqid(", true").'.'.$extension;
         Storage::putFileAs($directory,$request->file('file'),$name);
         return response()->json(['name' => $name,
                 'width' => $width,
@@ -49,7 +49,7 @@ class FileController extends Controller
     }
     public function downloadMessageFile($name)
     {
-        $directory = 'message_files/user_'.auth()->user()->id. '/';
+        $directory = 'message_files/';
         
         
         return response()->download(Storage::path($directory) .$name,null,
