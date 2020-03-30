@@ -32,7 +32,7 @@ class FileController extends Controller
         $width = getimagesize($request->file('file'))[0];
         $height = getimagesize($request->file('file'))[1];
         $directory = 'message_files';
-        $name = uniqid(", true").'.'.$extension;
+        $name = uniqid("", true).'.'.$extension;
         Storage::putFileAs($directory,$request->file('file'),$name);
         return response()->json(['name' => $name,
                 'width' => $width,
