@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Exception;
 use Facade\FlareClient\Http\Response;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 
 class CORS
@@ -18,6 +19,7 @@ class CORS
      */
     public function handle($request, Closure $next)
     {   
+        Log:info('came cors');
         $value = $next($request);
         if(method_exists($value, 'header' ))
         {
