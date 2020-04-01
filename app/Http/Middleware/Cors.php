@@ -17,11 +17,13 @@ class CORS
      * @return mixed
      */
     public function handle($request, Closure $next)
-    {
+    {   
         $value = $next($request);
-        if(method_exists($next($request), 'header' ))
+
+       
+        if(method_exists($value, 'header' ))
         {
-            $value = $next($request)
+            $value = $value
             ->header('Access-Control-Allow-Origin', '*')
             ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
             ->header('Access-Control-Allow-Headers', 'Content-Type, X-Auth-Token, Origin, Content-Type,Authorization');

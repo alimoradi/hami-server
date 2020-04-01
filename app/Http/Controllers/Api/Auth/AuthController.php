@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Route;
 use App\Interfaces\AccountVerifier;
 use App\Interfaces\UserAccessManager;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
+
 class AuthController extends Controller
 {
 
@@ -69,7 +71,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
 
-
+        Log::info('called login');
         $credentials = $request->only('username', 'password', 'role_id');
         
         if(auth()->attempt(['phone' => $credentials['username'], 'password' => $credentials['password']]))
