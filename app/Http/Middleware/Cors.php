@@ -19,8 +19,6 @@ class CORS
     public function handle($request, Closure $next)
     {   
         $value = $next($request);
-
-       
         if(method_exists($value, 'header' ))
         {
             $value = $value
