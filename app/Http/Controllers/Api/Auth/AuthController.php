@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Route;
 use App\Interfaces\AccountVerifier;
 use App\Interfaces\UserAccessManager;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
@@ -39,21 +40,41 @@ class AuthController extends Controller
         $user->last_name=$request->input('last_name');
         $user->phone=$request->input('phone');
         $user->password=$request->input('password');
-        $user->verification_code = $this->accountVerifier->generateVerificationCode();
-        if($this->accountVerifier->sendVerificationCode($user->verification_code))
-        {
-            $user->tinode_username = $request->input('tinode_username');
-            $user->tinode_pass = $request->input('tinode_pass');
-            $user->tinode_uid = $request->input('tinode_uid');
-            $user->role_id = $this->accessManager->getRoleId('service_user');
-            $user->save();
-            return response()->json(['success' => true]);
-        }
-        return response()->json(['success' => false, 'error' => 'verification_code_not_sent']);
+        $user->tinode_username = $request->input('tinode_username');
+        $user->tinode_pass = $request->input('tinode_pass');
+        $user->tinode_uid = $request->input('tinode_uid');
+        $user->role_id = $this->accessManager->getRoleId('service_user');
+        $user->save();
+        return response()->json(['success' => true]);
+        
 
 
     }
-    
+    public function requestVerificationCode(AccountVerifier $verifier,Request $request )
+    {
+        $request->validate(['phone'=> 'required'], ['password' => 'required']);
+        $user = null;
+        try
+        {
+            $user = User::where('phone', $request->input('phone'))
+            ->where('password', $request->input('password'))
+            ->firstOrFail();
+        }
+        catch(Exception $e)
+        {
+            abort(404,'phone number and password mismatch' );
+            
+        }
+        $user->verification_code = $this->accountVerifier->generateVerificationCode();
+        if($this->accountVerifier->sendVerificationCode($user->verification_code,$user->phone ))
+        {
+            $user->phone_verified_at = null;
+            $user->save();
+            return response()->json(['success' => true],200);
+        }
+        abort(400, 'verification code not sent');
+        
+    }
     public function verify(Request $request)
     {
 
@@ -66,12 +87,12 @@ class AuthController extends Controller
             return response()->json(['success' => true]);
         }
         return response()->json(['error' => 'verification_code_mismatch', 'error_message' => 'The provided verification code is invalid.',
-                                    'error_description' => 'The provided verification code is invalid.']);
+                                    'error_description' => 'The provided verification code is invalid.'],404);
     }
     public function login(Request $request)
     {
 
-        Log::info('called login');
+        
         $credentials = $request->only('username', 'password', 'role_id');
         
         if(auth()->attempt(['phone' => $credentials['username'], 'password' => $credentials['password']]))

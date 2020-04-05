@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "2579463ccbc7004895013d0940831dba",
-    "content-hash": "4a04d511a3c51335bf6494969f850ef8",
+    "hash": "de3d58c06030cdf0209dc2f69c31691c",
+    "content-hash": "4f31fb385c843e1834ea4f10a3c2b8c1",
     "packages": [
         {
             "name": "defuse/php-encryption",
@@ -923,6 +923,7 @@
                     "email": "jakub.onderka@gmail.com"
                 }
             ],
+            "abandoned": "php-parallel-lint/php-console-color",
             "time": "2018-09-29 17:23:10"
         },
         {
@@ -969,6 +970,7 @@
                 }
             ],
             "description": "Highlight PHP code in terminal",
+            "abandoned": "php-parallel-lint/php-console-highlighter",
             "time": "2018-09-29 18:48:56"
         },
         {
@@ -1578,6 +1580,7 @@
                 "markdown",
                 "table"
             ],
+            "abandoned": "league/commonmark",
             "time": "2019-09-26 13:28:33"
         },
         {

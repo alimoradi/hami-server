@@ -8,5 +8,5 @@ use App\User;
     */
     public function generateVerificationCode();
 
-    public function sendVerificationCode($verificationCode);
+    public function sendVerificationCode($verificationCode, $phoneNumber);
 }
