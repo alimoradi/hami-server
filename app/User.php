@@ -28,6 +28,10 @@ class User extends Authenticatable
     public function getAuthPassword() {
         return Hash::make($this->password);
     }
+    public function routeNotificationForFcm()
+    {
+        return $this->fcm_token;
+    }
     public function role()
     {
         return $this->belongsTo(Role::class);

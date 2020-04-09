@@ -24,6 +24,10 @@ Route::namespace('Api')->group(function () {
         Route::post('verify', 'AuthController@verify');
         Route::post('requestVerificationCode', 'AuthController@requestVerificationCode');
         Route::post('postRegisterVerify', 'AuthController@postRegisterVerify');
+        Route::middleware('auth:api')->group(function(){
+            Route::post('setFcmToken', 'AuthController@setFcmToken');
+            Route::post('unsetFcmToken', 'AuthController@unsetFcmToken');
+        });
     });
     Route::resource('categories', 'ProviderCategoriesController');
     Route::prefix('providers')->group(function () {
@@ -34,6 +38,12 @@ Route::namespace('Api')->group(function () {
             Route::post('addFavorite/{providerId}', 'FavoriteProvidersController@add');
             Route::post('deleteFavorite/{providerId}', 'FavoriteProvidersController@delete');
             Route::get('favorites', 'FavoriteProvidersController@index');
+        });
+    });
+    Route::prefix('notify')->group(function () {
+        
+        Route::middleware('auth:api')->group(function(){
+            Route::post('sentMessage/{recipeintUserId}', 'UsersController@notifySentMessage');
         });
     });
     Route::prefix('users')->group(function () {
