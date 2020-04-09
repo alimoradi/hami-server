@@ -9,16 +9,12 @@ use NotificationChannels\Fcm\Resources\AndroidNotification;
 use NotificationChannels\Fcm\Resources\ApnsConfig;
 use NotificationChannels\Fcm\Resources\ApnsFcmOptions;
 
-class MessageReceived extends Notification
+class SessionAccepted extends Notification
 {
-   
-    private $sender;
-    private $chatTopic;
-     function __construct( $sender, $topic)
+    private $sessionId;
+     function __construct($sessionId)
     {
-        
-        $this->sender = $sender;
-        $this->chatTopic = $topic;
+        $this->sessionId = $sessionId;
     }
     public function via($notifiable)
     {
@@ -28,11 +24,10 @@ class MessageReceived extends Notification
     public function toFcm($notifiable)
     {
         return FcmMessage::create()
-            ->setName('MessageReceived')
-            ->setData(['sender' => $this->sender, 'notification_code' => '0', 'topic'=> $this->chatTopic])
+            ->setData(['data1' => 'value', 'data2' => 'value2'])
             ->setNotification(\NotificationChannels\Fcm\Resources\Notification::create()
-                ->setTitle('پیام جدید')
-                ->setBody('برای شما پیام جدیدی ارسال شده است.')
+                ->setTitle('Account Activated')
+                ->setBody($this->sessionId)
                 ->setImage('http://example.com/url-to-image-here.png'))
             ->setAndroid(
                 AndroidConfig::create()

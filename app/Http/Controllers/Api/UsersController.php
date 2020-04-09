@@ -20,9 +20,13 @@ class UsersController extends Controller
         return User::where('tinode_uid', $uid)->first();
     }
     
-    public function notifySentMessage(Request $request, $recipientUserId)
+    public function notifySentMessage(Request $request)
     {
+        
+        $recipientUserId = $request->input('recipient_user_id');
+        $topic = $request->input('topic');
         $user = User::where('id', $recipientUserId)->first();
-        $user -> notify(new MessageReceived('hello'));
+        $user -> notify(new MessageReceived( json_encode(auth()->user()), $topic));
+        return response()->json(['success'=> true]);
     }
 }

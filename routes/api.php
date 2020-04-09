@@ -43,7 +43,7 @@ Route::namespace('Api')->group(function () {
     Route::prefix('notify')->group(function () {
         
         Route::middleware('auth:api')->group(function(){
-            Route::post('sentMessage/{recipeintUserId}', 'UsersController@notifySentMessage');
+            Route::post('sentMessage', 'UsersController@notifySentMessage');
         });
     });
     Route::prefix('users')->group(function () {
