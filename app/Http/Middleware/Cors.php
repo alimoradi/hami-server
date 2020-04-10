@@ -19,7 +19,7 @@ class CORS
      */
     public function handle($request, Closure $next)
     {   
-        Log:info('came cors');
+        
         $value = $next($request);
         if(method_exists($value, 'header' ))
         {
