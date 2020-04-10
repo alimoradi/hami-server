@@ -8,7 +8,7 @@ use Facade\FlareClient\Http\Response;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 
-class CORS
+class Cors
 {
     /**
      * Handle an incoming request.
