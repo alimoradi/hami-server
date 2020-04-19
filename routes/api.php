@@ -25,6 +25,7 @@ Route::namespace('Api')->group(function () {
         Route::post('requestVerificationCode', 'AuthController@requestVerificationCode');
         Route::post('postRegisterVerify', 'AuthController@postRegisterVerify');
         Route::middleware('auth:api')->group(function(){
+            Route::post('updateChatCredentials', 'AuthController@updateChatCredentials');
             Route::post('setFcmToken', 'AuthController@setFcmToken');
             Route::post('unsetFcmToken', 'AuthController@unsetFcmToken');
         });
@@ -38,6 +39,16 @@ Route::namespace('Api')->group(function () {
             Route::post('addFavorite/{providerId}', 'FavoriteProvidersController@add');
             Route::post('deleteFavorite/{providerId}', 'FavoriteProvidersController@delete');
             Route::get('favorites', 'FavoriteProvidersController@index');
+        });
+    });
+    Route::prefix('calendar')->group(function () {
+       Route::middleware('auth:api')->group(function(){
+            Route::post('addAvailableHours', 'AvailableHoursController@add');
+            Route::post('removeAvailableHours/{availableHoursId}', 'AvailableHoursController@remove');
+            Route::post('disableAvailableHours/{availableHoursId}', 'AvailableHoursController@disable');
+            Route::post('enableAvailableHours/{availableHoursId}', 'AvailableHoursController@enable');
+            Route::post('toggleDisabledAvailableHours/{availableHoursId}', 'AvailableHoursController@toggleDisabled');
+            Route::post('availableHours', 'AvailableHoursController@get');
         });
     });
     Route::prefix('notify')->group(function () {
@@ -57,14 +68,16 @@ Route::namespace('Api')->group(function () {
         
         Route::middleware('auth:api')->group(function(){
             Route::post('uploadMessageFile', 'FileController@uploadMessageFile');
+            Route::post('uploadAvatar', 'FileController@uploadAvatar');
             Route::get('downloadMessageFile/{name}', 'FileController@downloadMessageFile');
         });
     });
     Route::prefix('sessions')->group(function () {
         
         Route::middleware('auth:api')->group(function(){
-            Route::post('request/{providerId}/{chatTopicName}', 'SessionsController@request');
+            Route::post('request', 'SessionsController@request');
             Route::post('start/{sessionId}', 'SessionsController@start');
+            Route::post('accept/{sessionId}', 'SessionsController@accept');
             Route::post('end/{sessionId}', 'SessionsController@end');
             Route::get('userActiveSessions', 'SessionsController@userActiveSessions');
             Route::get('userEndedSessions', 'SessionsController@userEndedSessions');
@@ -72,6 +85,10 @@ Route::namespace('Api')->group(function () {
             Route::get('providerActiveSessions', 'SessionsController@providerActiveSessions');
             Route::get('providerEndedSessions', 'SessionsController@providerEndedSessions');
             Route::get('providerRequestedSessions', 'SessionsController@providerRequestedSessions');
+            Route::get('getPresentAndFutureSessions', 'SessionsController@getPresentAndFutureSessions');
+
+            Route::get('getPastSessions', 'SessionsController@getPastSessions');
+
         });
     });
     Route::prefix('tinodeAuthenticator')->group(function () {

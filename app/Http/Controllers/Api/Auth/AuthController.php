@@ -25,7 +25,20 @@ class AuthController extends Controller
         $this->accountVerifier = $verifier;
         $this->accessManager = $accessManager;
     }
-
+    public function updateChatCredentials(Request $request)
+    {
+        $request->validate([
+             'tinode_pass' => 'required'
+                ,'tinode_uid' => 'required',
+                'tinode_username'=> 'required'
+            ]);
+        $user = auth()->user();
+        $user->tinode_pass = $request->input('tinode_pass');
+        $user->tinode_uid = $request->input('tinode_uid');
+        $user->tinode_username = $request->input('tinode_username');
+        $user->save();
+        return response()->json(['success' => true]); 
+    }
     public function register(AccountVerifier $verifier, Request $request)
     {
 
@@ -33,17 +46,18 @@ class AuthController extends Controller
             , 'password' => 'required'
             , 'first_name' => 'required'
             , 'last_name' => 'required'
-            , 'tinode_username' => 'required'
-            , 'tinode_pass' => 'required'
-            , 'tinode_uid' => 'required']);
+            //, 'tinode_username' => 'required'
+            //, 'tinode_pass' => 'required'
+            //, 'tinode_uid' => 'required'
+            ]);
         $user = new User;
         $user->first_name=$request->input('first_name');
         $user->last_name=$request->input('last_name');
         $user->phone=$request->input('phone');
         $user->password=$request->input('password');
-        $user->tinode_username = $request->input('tinode_username');
-        $user->tinode_pass = $request->input('tinode_pass');
-        $user->tinode_uid = $request->input('tinode_uid');
+        //$user->tinode_username = $request->input('tinode_username');
+        //$user->tinode_pass = $request->input('tinode_pass');
+        //$user->tinode_uid = $request->input('tinode_uid');
         $user->role_id = $this->accessManager->getRoleId('service_user');
         $user->save();
         return response()->json(['success' => true]);

@@ -9,7 +9,7 @@ use NotificationChannels\Fcm\Resources\AndroidNotification;
 use NotificationChannels\Fcm\Resources\ApnsConfig;
 use NotificationChannels\Fcm\Resources\ApnsFcmOptions;
 
-class SessionAccepted extends Notification
+class SessionUpdated extends Notification
 {
     private $sessionId;
      function __construct($sessionId)
@@ -24,7 +24,7 @@ class SessionAccepted extends Notification
     public function toFcm($notifiable)
     {
         return FcmMessage::create()
-            ->setData(['data1' => 'value', 'data2' => 'value2'])
+            ->setData(['notification_code' => '1', 'data2' => 'value2'])
             ->setNotification(\NotificationChannels\Fcm\Resources\Notification::create()
                 ->setTitle('Account Activated')
                 ->setBody($this->sessionId)

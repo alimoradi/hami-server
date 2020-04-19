@@ -16,4 +16,8 @@ class Provider extends Model
     {
         return $this->belongsTo(ProviderCategory::class);
     }
+    public function availableHours()
+    {
+        return $this->hasMany(AvailableHours::class);
+    }
 }
