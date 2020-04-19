@@ -38,7 +38,7 @@ class AuthController extends Controller
         $user->save();
         return response()->json(['success' => true]);
     }
-    public function changePasswod(Request $request)
+    public function changePassword(Request $request)
     {
         $request->validate([
             'old_password' => 'required', 'new_password' => 'required'
