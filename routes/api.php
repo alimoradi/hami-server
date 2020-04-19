@@ -28,6 +28,7 @@ Route::namespace('Api')->group(function () {
             Route::post('updateChatCredentials', 'AuthController@updateChatCredentials');
             Route::post('setFcmToken', 'AuthController@setFcmToken');
             Route::post('unsetFcmToken', 'AuthController@unsetFcmToken');
+            Route::post('changePassword', 'AuthController@changePassword');
         });
     });
     Route::resource('categories', 'ProviderCategoriesController');
