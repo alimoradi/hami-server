@@ -48,7 +48,7 @@ class AuthController extends Controller
         {
             abort(401, 'Wrong Password');
         }
-        auth()->user()->password = $request->input('old_password');
+        auth()->user()->password = $request->input('new_password');
         auth()->user()->save();
         return response()->json(['success' => true]);
     }
