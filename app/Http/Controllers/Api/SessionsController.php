@@ -107,6 +107,28 @@ class SessionsController extends Controller
         }
         return $sessions->get();
     }
+    public function selectRangeByDate(Request $request)
+    {
+        $request->validate([
+            'from_date' => 'required', 'to_date' => 'required'
+        ]);
+        $fromDate = $request->input('from_date');
+        $toDate = $request->input('to_date');
+        $sessions = Session::where('started', '>=', $fromDate)
+        ->where('ended', '!=' , null)
+        ->where('started', '<=', $toDate);
+        if(auth()->user()->role_id == 2)
+        {
+            $sessions = $sessions->where('user_id' , auth()->user()->id);
+        }
+        else if(auth()->user()->role_id == 1)
+        {
+            $sessions = $sessions->whereHas('provider.user' , function($query){
+                $query->where('id', '=', auth()->user()->id);
+            });
+        }
+        return $sessions->get();
+    }
     public function providerEndedSessions()
     {
         
