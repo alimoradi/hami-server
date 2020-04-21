@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Libraries\Notifications\SessionUpdated;
 use App\Provider;
 use App\Session;
+use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -169,5 +171,15 @@ class SessionsController extends Controller
             ->where('started' , null)
             ->orderBy('started', 'DESC')
             ->get();
+    }
+    public function notifySessionUpdate(Request $request)
+    {
+        
+        $recipientUserId = $request->input('recipient_user_id');
+        $sessionId = $request->input('session_id');
+        $session = Session::find($sessionId);
+        $user = User::where('id', $recipientUserId)->first();
+        $user -> notify(new SessionUpdated(json_encode($session), json_encode(auth()->user())));
+        return response()->json(['success'=> true]);
     }
 }

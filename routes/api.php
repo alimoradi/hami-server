@@ -56,6 +56,7 @@ Route::namespace('Api')->group(function () {
         
         Route::middleware('auth:api')->group(function(){
             Route::post('sentMessage', 'UsersController@notifySentMessage');
+            Route::post('sessionUpdate', 'UsersController@notifySessionUpdate');
         });
     });
     Route::prefix('users')->group(function () {

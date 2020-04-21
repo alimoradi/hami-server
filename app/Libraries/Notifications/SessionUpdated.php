@@ -11,10 +11,13 @@ use NotificationChannels\Fcm\Resources\ApnsFcmOptions;
 
 class SessionUpdated extends Notification
 {
-    private $sessionId;
-     function __construct($sessionId)
+    private $session;
+    private $sender;
+    private $notificationCode = 1;
+     function __construct($session, $sender )
     {
-        $this->sessionId = $sessionId;
+        $this->sessionId = $session;
+        $this->$sender = $sender;
     }
     public function via($notifiable)
     {
@@ -24,7 +27,7 @@ class SessionUpdated extends Notification
     public function toFcm($notifiable)
     {
         return FcmMessage::create()
-            ->setData(['notification_code' => '1', 'data2' => 'value2'])
+            ->setData(['notification_code' => '1', 'sender' => $this->sender, 'session'=> $this->session])
             ->setNotification(\NotificationChannels\Fcm\Resources\Notification::create()
                 ->setTitle('Account Activated')
                 ->setBody($this->sessionId)
@@ -38,4 +41,3 @@ class SessionUpdated extends Notification
                     ->setFcmOptions(ApnsFcmOptions::create()->setAnalyticsLabel('analytics_ios')));
     }
 }
-?>

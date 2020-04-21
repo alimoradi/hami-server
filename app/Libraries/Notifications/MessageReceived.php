@@ -14,12 +14,13 @@ class MessageReceived extends Notification
    
     private $sender;
     private $chatTopic;
+    private $notificationCode = 0;
      function __construct( $sender, $topic)
     {
         
         $this->sender = $sender;
         $this->chatTopic = $topic;
-    }
+    }   
     public function via($notifiable)
     {
         return [FcmChannel::class];
@@ -29,7 +30,7 @@ class MessageReceived extends Notification
     {
         return FcmMessage::create()
             ->setName('MessageReceived')
-            ->setData(['sender' => $this->sender, 'notification_code' => '0', 'topic'=> $this->chatTopic])
+            ->setData(['sender' => $this->sender, 'notification_code' => $this->notificationCode, 'topic'=> $this->chatTopic])
             ->setNotification(\NotificationChannels\Fcm\Resources\Notification::create()
                 ->setTitle('پیام جدید')
                 ->setBody('برای شما پیام جدیدی ارسال شده است.')
