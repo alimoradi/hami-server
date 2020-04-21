@@ -30,7 +30,7 @@ class MessageReceived extends Notification
     {
         return FcmMessage::create()
             ->setName('MessageReceived')
-            ->setData(['sender' => $this->sender, 'notification_code' => $this->notificationCode, 'topic'=> $this->chatTopic])
+            ->setData(['sender' => $this->sender, 'notification_code' => '0', 'topic'=> $this->chatTopic])
             ->setNotification(\NotificationChannels\Fcm\Resources\Notification::create()
                 ->setTitle('پیام جدید')
                 ->setBody('برای شما پیام جدیدی ارسال شده است.')
