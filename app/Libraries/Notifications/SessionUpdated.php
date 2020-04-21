@@ -17,7 +17,7 @@ class SessionUpdated extends Notification
      function __construct($session, $sender )
     {
         $this->session = $session;
-        $this->$sender = $sender;
+        $this->sender = $sender;
     }
     public function via($notifiable)
     {
