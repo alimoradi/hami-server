@@ -29,8 +29,8 @@ class SessionUpdated extends Notification
         return FcmMessage::create()
             ->setData(['notification_code' => '1', 'sender' => $this->sender, 'session'=> $this->session])
             ->setNotification(\NotificationChannels\Fcm\Resources\Notification::create()
-                ->setTitle('Account Activated')
-                ->setBody($this->sessionId)
+                ->setTitle('به روزرسانی وضعیت جلسه')
+                ->setBody('وضعیت جلسه به روز رسانی شد.')
                 ->setImage('http://example.com/url-to-image-here.png'))
             ->setAndroid(
                 AndroidConfig::create()
