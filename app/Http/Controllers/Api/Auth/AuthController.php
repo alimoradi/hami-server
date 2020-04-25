@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Route;
 use App\Interfaces\AccountVerifier;
 use App\Interfaces\UserAccessManager;
 use App\Libraries\Notifications\MessageReceived;
+use App\Provider;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Log;
@@ -43,9 +44,8 @@ class AuthController extends Controller
         $request->validate([
             'old_password' => 'required', 'new_password' => 'required'
         ]);
-        
-        if(auth()->user()->password != $request->input('old_password'))
-        {
+
+        if (auth()->user()->password != $request->input('old_password')) {
             abort(401, 'Wrong Password');
         }
         auth()->user()->password = $request->input('new_password');
@@ -54,23 +54,40 @@ class AuthController extends Controller
     }
     public function register(AccountVerifier $verifier, Request $request)
     {
-
-        $request->validate([
-            'phone' => 'required|unique:users', 'password' => 'required', 'first_name' => 'required', 'last_name' => 'required'
-            //, 'tinode_username' => 'required'
-            //, 'tinode_pass' => 'required'
-            //, 'tinode_uid' => 'required'
-        ]);
+        $validations = [
+            'phone' => 'required|unique:users',
+            'password' => 'required',
+            'first_name' => 'required',
+            'last_name' => 'required',
+            'role_id' => 'required'
+        ];
+        $roleId = $request->input('role_id');
+        $isProvider = $roleId == $this->accessManager->getRoleId('service_provider');
+        if($isProvider)
+        {
+            $validations['provider_category_id'] = 'required'; 
+        }   
+        $request->validate($validations);
         $user = new User;
         $user->first_name = $request->input('first_name');
         $user->last_name = $request->input('last_name');
         $user->phone = $request->input('phone');
         $user->password = $request->input('password');
+        
+        $user->role_id = $roleId;
         //$user->tinode_username = $request->input('tinode_username');
         //$user->tinode_pass = $request->input('tinode_pass');
         //$user->tinode_uid = $request->input('tinode_uid');
-        $user->role_id = $this->accessManager->getRoleId('service_user');
-        $user->save();
+        //$user->role_id = $this->accessManager->getRoleId('service_user');  
+        if($user->save() && $isProvider)
+        {
+            $provider = new Provider;
+            $provider->provider_category_id = $request->input('provider_category_id');
+            $provider->per_minute_text_fee = 1200;
+            $user->provider()->save($provider);
+        }      
+        
+        
         return response()->json(['success' => true]);
     }
     public function requestVerificationCode(AccountVerifier $verifier, Request $request)

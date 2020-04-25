@@ -25,6 +25,10 @@ class User extends Authenticatable
 
         return $password == $this->password;
     }
+    public function provider()
+    {
+        return $this->hasOne(Provider::class);
+    }
     public function getAuthPassword() {
         return Hash::make($this->password);
     }
