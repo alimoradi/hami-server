@@ -40,6 +40,8 @@ Route::namespace('Api')->group(function () {
             Route::post('addFavorite/{providerId}', 'FavoriteProvidersController@add');
             Route::post('deleteFavorite/{providerId}', 'FavoriteProvidersController@delete');
             Route::get('favorites', 'FavoriteProvidersController@index');
+            Route::post('addCategory', 'ProviderCategoriesController@add');
+            Route::post('editCategory', 'ProviderCategoriesController@edit');
         });
     });
     Route::prefix('calendar')->group(function () {

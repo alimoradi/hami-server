@@ -19,4 +19,36 @@ class ProviderCategoriesController extends Controller
         return ProviderCategory::where('id', $id)->first();
         
     }
+    public function add(Request $request)
+    {
+        $request->validate(
+            ['name'=> 'required',
+             'icon_name' => 'required']
+        );
+        $name = $request->input('name');
+        $iconName = $request->input('icon_name');
+        $category = new ProviderCategory();
+        $category->name = $name;
+        $category->icon_name = $iconName;
+        $category->save();
+
+        return ProviderCategory::find($category->id);
+    }
+    public function edit(Request $request)
+    {
+        $request->validate(
+            [
+            'id' => 'required',
+            'name'=> 'required',
+             'icon_name' => 'required']
+        );
+        $category = ProviderCategory::find($request->input('id'));
+        $name = $request->input('name');
+        $iconName = $request->input('icon_name');
+        $category->name = $name;
+        $category->icon_name = $iconName;
+        $category->save();
+
+        return $category;
+    }
 }
