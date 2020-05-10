@@ -140,7 +140,7 @@ class AuthController extends Controller
     {
 
 
-        $credentials = $request->only('username', 'password', 'role_id');
+        $credentials = $request->only('username', 'password');
 
         if (auth()->attempt(['phone' => $credentials['username'], 'password' => $credentials['password']])) {
 
