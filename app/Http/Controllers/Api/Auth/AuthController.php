@@ -63,31 +63,29 @@ class AuthController extends Controller
         ];
         $roleId = $request->input('role_id');
         $isProvider = $roleId == $this->accessManager->getRoleId('service_provider');
-        if($isProvider)
-        {
-            $validations['provider_category_id'] = 'required'; 
-        }   
+        if ($isProvider) {
+            $validations['provider_category_id'] = 'required';
+        }
         $request->validate($validations);
         $user = new User;
         $user->first_name = $request->input('first_name');
         $user->last_name = $request->input('last_name');
         $user->phone = $request->input('phone');
         $user->password = $request->input('password');
-        
+
         $user->role_id = $roleId;
         //$user->tinode_username = $request->input('tinode_username');
         //$user->tinode_pass = $request->input('tinode_pass');
         //$user->tinode_uid = $request->input('tinode_uid');
         //$user->role_id = $this->accessManager->getRoleId('service_user');  
-        if($user->save() && $isProvider)
-        {
+        if ($user->save() && $isProvider) {
             $provider = new Provider;
             $provider->provider_category_id = $request->input('provider_category_id');
             $provider->per_minute_text_fee = 1200;
             $user->provider()->save($provider);
-        }      
-        
-        
+        }
+
+
         return response()->json(['success' => true]);
     }
     public function requestVerificationCode(AccountVerifier $verifier, Request $request)
@@ -147,12 +145,7 @@ class AuthController extends Controller
         if (auth()->attempt(['phone' => $credentials['username'], 'password' => $credentials['password']])) {
 
             $user = User::where('phone', $credentials['username'])->first();
-            if ($credentials['role_id'] != $user->role_id) {
-                return response()->json([
-                    'error' => 'invalid_role_id', 'error_message' => 'The provided role id is invalid.',
-                    'error_description' => 'The provided role id invalid.'
-                ], 403);
-            }
+            
             $role = $user->checkRole();
             $scopes = '';
             // grant scopes based on the role that we get previously
