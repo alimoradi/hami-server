@@ -34,6 +34,7 @@ Route::namespace('Api')->group(function () {
     Route::resource('categories', 'ProviderCategoriesController');
     Route::prefix('providers')->group(function () {
         Route::get('getByCategoryId/{categoryId}', 'ProvidersController@getByCategoryId');
+        Route::get('getAll', 'ProvidersController@getAll');
         Route::get('getByUid/{uid}', 'ProvidersController@getByUid');
         Route::get('getById/{id}', 'ProvidersController@getById');
         Route::middleware('auth:api')->group(function(){
