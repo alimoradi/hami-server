@@ -34,7 +34,6 @@ class UsersController extends Controller
     {
         $request->validate(
             [
-            'user_id' => 'required',
             'national_code'=> 'required',
              'postal_code' => 'required',
              'land_line_number' => 'required',
@@ -43,12 +42,12 @@ class UsersController extends Controller
 
         );
         $info = null;
-       
-        $info = AdditionalInfo::where('user_id',$request->input('user_id') )->first();
+        $userId = auth()->user()->id;
+        $info = AdditionalInfo::where('user_id',$userId )->first();
         if(!$info)
         {
             $info = new AdditionalInfo();
-            $info->user_id = $request->input('user_id');
+            $info->user_id = $userId;
 
         }
 
