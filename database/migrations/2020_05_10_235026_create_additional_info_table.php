@@ -16,7 +16,7 @@ class CreateAdditionalInfoTable extends Migration
         Schema::create('additional_info', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string("national_code", 10)->nullable();
-            $table->string("land_line_number")->nullabel();
+            $table->string("land_line_number")->nullable();
             $table->string("address")->nullable();
             $table->string("postal_code",10)->nullable();
             $table->bigInteger("user_id");
