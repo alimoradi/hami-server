@@ -32,15 +32,7 @@ class UsersController extends Controller
     }
     public function updateInfo(Request $request)
     {
-        $request->validate(
-            [
-            'national_code'=> 'required',
-             'postal_code' => 'required',
-             'land_line_number' => 'required',
-            'address'=> 'required'
-            ]
-
-        );
+        
         $info = null;
         $userId = auth()->user()->id;
         $info = AdditionalInfo::where('user_id',$userId )->first();
