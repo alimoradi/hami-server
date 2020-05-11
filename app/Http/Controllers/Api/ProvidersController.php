@@ -19,7 +19,7 @@ class ProvidersController extends Controller
     public function getByUserId($userId)
     {
         
-        return Provider::with(['user', 'providerCategory', 'user.additionalInfo'])->where('user_id', $userId)->get();
+        return Provider::with(['user', 'providerCategory', 'user.additionalInfo'])->where('user_id', $userId)->first();
     }
     public function getAll()
     {
