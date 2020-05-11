@@ -59,4 +59,9 @@ class UsersController extends Controller
 
         return $info;
     }
+    public function getAdditionalInfo($userId)
+    {
+        return AdditionalInfo::where('user_id',$userId )->first();
+
+    }
 }

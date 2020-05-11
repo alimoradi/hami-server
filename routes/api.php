@@ -71,6 +71,8 @@ Route::namespace('Api')->group(function () {
             Route::get('getById/{id}', 'UsersController@getById');
             Route::get('getByUid/{uid}', 'UsersController@getByUid');
             Route::post('updateInfo', 'UsersController@updateInfo');
+            Route::get('getAdditionalInfo/{userId}', 'UsersController@getAdditionalInfo');
+
         });
     });
     Route::prefix('files')->group(function () {
