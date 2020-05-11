@@ -45,7 +45,10 @@ class User extends Authenticatable
         return $this->role->name;
     }
 
-
+    public function additionalInfo()
+    {
+        return $this->hasOne(AdditionalInfo::class);
+    }
     /**
      * The attributes that are mass assignable.
      *

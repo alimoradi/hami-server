@@ -43,6 +43,9 @@ Route::namespace('Api')->group(function () {
             Route::get('favorites', 'FavoriteProvidersController@index');
             Route::post('addCategory', 'ProviderCategoriesController@add');
             Route::post('editCategory', 'ProviderCategoriesController@edit');
+            Route::post('uploadVerificationDocument', 'ProvidersController@uploadVerificationDocument');
+
+            Route::post('verify/{providerId}', 'ProvidersController@verifyProvider');
         });
     });
     Route::prefix('calendar')->group(function () {
@@ -67,6 +70,7 @@ Route::namespace('Api')->group(function () {
         Route::middleware('auth:api')->group(function(){
             Route::get('getById/{id}', 'UsersController@getById');
             Route::get('getByUid/{uid}', 'UsersController@getByUid');
+            Route::post('updateInfo', 'UsersController@updateInfo');
         });
     });
     Route::prefix('files')->group(function () {

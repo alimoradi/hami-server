@@ -20,4 +20,9 @@ class Provider extends Model
     {
         return $this->hasMany(AvailableHours::class);
     }
+    public function providerVerificationDocuments()
+    {
+        return $this->hasMany(ProviderVerificationDocument::class);
+    }
+    
 }

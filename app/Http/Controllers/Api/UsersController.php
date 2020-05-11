@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\AdditionalInfo;
 use App\Libraries\Notifications\MessageReceived;
 use App\Http\Controllers\Controller;
 use App\User;
@@ -28,5 +29,35 @@ class UsersController extends Controller
         $user = User::where('id', $recipientUserId)->first();
         $user -> notify(new MessageReceived( json_encode(auth()->user()), $topic));
         return response()->json(['success'=> true]);
+    }
+    public function updateInfo(Request $request)
+    {
+        $request->validate(
+            [
+            'user_id' => 'required',
+            'national_code'=> 'required',
+             'postal_code' => 'required',
+             'land_line_number' => 'required',
+            'address'=> 'required'
+            ]
+
+        );
+        $info = null;
+       
+        $info = AdditionalInfo::where('user_id',$request->input('user_id') )->first();
+        if(!$info)
+        {
+            $info = new AdditionalInfo();
+            $info->user_id = $request->input('user_id');
+
+        }
+
+        $info->address = $request->input('address');
+        $info->national_code = $request->input('national_code');
+        $info->land_line_number = $request->input('land_line_number');
+        $info->postal_code = $request->input('postal_code');
+        $info->save();
+
+        return $info;
     }
 }
