@@ -14,12 +14,12 @@ class ProvidersController extends Controller
     public function getByCategoryId($categoryId)
     {
 
-        return Provider::with(['user', 'providerCategory'])->where('provider_category_id', $categoryId)->get();
+        return Provider::with(['user', 'providerCategory', 'providerVerificationDocuments'])->where('provider_category_id', $categoryId)->get();
     }
     public function getByUserId($userId)
     {
 
-        return Provider::with(['user', 'providerCategory', 'user.additionalInfo'])->where('user_id', $userId)->first();
+        return Provider::with(['user', 'providerCategory', 'providerVerificationDocuments', 'user.additionalInfo'])->where('user_id', $userId)->first();
     }
     public function getAll()
     {
