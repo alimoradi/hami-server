@@ -46,7 +46,16 @@ class ProvidersController extends Controller
     }
     public function getCertificateUrl()
     {
+        $providerId = Provider::where('user_id',auth()->user()->id )->first()->id;
 
+        $document = ProviderVerificationDocument::where("provider_id", $providerId)->where('title', 'مدرک تحصیلی')->first();
+        if($document)
+        {
+            $directory = 'verification_documents/';
+            $image = Storage::temporaryUrl($directory.$document->url, now()->addMinutes(10)); 
+            return response()->json($image);
+        }
+       
     }
     public function uploadVerificationDocument(Request $request)
     {
