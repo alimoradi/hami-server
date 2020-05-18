@@ -81,11 +81,8 @@ class ProvidersController extends Controller
         $name = uniqid("", true).'.'.$extension;
         Storage::putFileAs($directory,$request->file('file'),$name);
         $providerId = Provider::where('user_id',auth()->user()->id )->first()->id;
-        $document = ProviderVerificationDocument::where("provider_id", $providerId)->where('title', $title)->get();
-        if($document)
-        {
-            $document->delete();
-        }
+        $document = ProviderVerificationDocument::where("provider_id", $providerId)->where('title', $title)->delete();
+       
         $document = new ProviderVerificationDocument();
         $document->provider_id = $providerId ;
         $document->url = $name;
