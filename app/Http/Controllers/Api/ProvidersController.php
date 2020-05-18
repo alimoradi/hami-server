@@ -51,9 +51,10 @@ class ProvidersController extends Controller
             ]
 
         );
+        $title = $request->input('title');
         $providerId = Provider::where('user_id', auth()->user()->id)->first()->id;
 
-        $document = ProviderVerificationDocument::where("provider_id", $providerId)->where('title',$request->input('title'))->first();
+        $document = ProviderVerificationDocument::where("provider_id", $providerId)->where('title',$title)->first();
         if ($document) {
             $directory = 'verification_documents/';
             //$image = Storage::url($directory.$document->url); 
