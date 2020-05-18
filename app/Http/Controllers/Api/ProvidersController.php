@@ -44,6 +44,10 @@ class ProvidersController extends Controller
         return response()->json(['success' => true]);
 
     }
+    public function getCertificateUrl()
+    {
+
+    }
     public function uploadVerificationDocument(Request $request)
     {
         $request->validate(
@@ -76,8 +80,14 @@ class ProvidersController extends Controller
         $directory = 'verification_documents';
         $name = uniqid("", true).'.'.$extension;
         Storage::putFileAs($directory,$request->file('file'),$name);
+        $providerId = Provider::where('user_id',auth()->user()->id )->first()->id;
+        $document = ProviderVerificationDocument::where("provider_id", $providerId)->where('title', $title)->first();
+        if($document)
+        {
+            $document->delete();
+        }
         $document = new ProviderVerificationDocument();
-        $document->provider_id =  Provider::where('user_id',auth()->user()->id )->first()->id;
+        $document->provider_id = $providerId ;
         $document->url = $name;
         $document->title = $title;
         $document->save();

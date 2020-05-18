@@ -62,7 +62,7 @@ class FileController extends Controller
           $extensions=[
         ];
         $size = $request->file('file')->getsize();
-        if($size > 1000000)
+        if($size > 2000000)
         {
             abort(413, "File too large");
         }
