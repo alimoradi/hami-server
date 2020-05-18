@@ -44,16 +44,28 @@ class ProvidersController extends Controller
         return response()->json(['success' => true]);
 
     }
-    public function getCertificateUrl()
+    public function downloadVerificationDocument(Request $request)
     {
+        $request->validate(
+            [
+            'title'=> 'required'
+            ]
+
+        );
         $providerId = Provider::where('user_id',auth()->user()->id )->first()->id;
 
-        $document = ProviderVerificationDocument::where("provider_id", $providerId)->where('title', 'مدرک تحصیلی')->first();
+        $document = ProviderVerificationDocument::where("provider_id", $providerId)->where('title', $title = $request->input('title'))->first();
         if($document)
         {
             $directory = 'verification_documents/';
-            $image = Storage::url($directory.$document->url); 
-            return response()->json($image);
+            //$image = Storage::url($directory.$document->url); 
+            return response()->download(Storage::path($directory) .$document->url,null,
+        [
+            'Access-Control-Allow-Origin'=> '*',
+            'Access-Control-Allow-Headers'=> 'Content-Type, X-Auth-Token, Origin, Content-Type,Authorization',
+            'Access-Control-Allow-Methods'=> 'GET, POST, PUT, DELETE, OPTIONS'
+        ]
+        );
         }
        
     }
