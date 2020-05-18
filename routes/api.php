@@ -44,7 +44,7 @@ Route::namespace('Api')->group(function () {
             Route::post('addCategory', 'ProviderCategoriesController@add');
             Route::post('editCategory', 'ProviderCategoriesController@edit');
             Route::post('uploadVerificationDocument', 'ProvidersController@uploadVerificationDocument');
-            Route::post('downloadVerificationDocument', 'ProvidersController@downloadVerificationDocument');
+            Route::post('downloadVerificationDocument/{name}', 'ProvidersController@downloadVerificationDocument');
             Route::get('getByUserId/{userId}', 'ProvidersController@getByUserId');
 
             Route::post('verify/{providerId}', 'ProvidersController@verifyProvider');

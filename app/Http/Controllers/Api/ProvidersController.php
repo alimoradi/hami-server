@@ -43,31 +43,20 @@ class ProvidersController extends Controller
         $provider->save();
         return response()->json(['success' => true]);
     }
-    public function downloadVerificationDocument(Request $request)
+    public function downloadVerificationDocument($name)
     {
-        $request->validate(
+
+        $directory = 'verification_documents/';
+        //$image = Storage::url($directory.$document->url); 
+        return response()->download(
+            Storage::path($directory) . $name,
+            null,
             [
-                'title' => 'required'
+                'Access-Control-Allow-Origin' => '*',
+                'Access-Control-Allow-Headers' => 'Content-Type, X-Auth-Token, Origin, Content-Type,Authorization',
+                'Access-Control-Allow-Methods' => 'GET, POST, PUT, DELETE, OPTIONS'
             ]
-
         );
-        $title = $request->input('title');
-        $providerId = Provider::where('user_id', auth()->user()->id)->first()->id;
-
-        $document = ProviderVerificationDocument::where("provider_id", $providerId)->where('title',$title)->first();
-        if ($document) {
-            $directory = 'verification_documents/';
-            //$image = Storage::url($directory.$document->url); 
-            return response()->download(
-                Storage::path($directory) . $document->url,
-                null,
-                [
-                    'Access-Control-Allow-Origin' => '*',
-                    'Access-Control-Allow-Headers' => 'Content-Type, X-Auth-Token, Origin, Content-Type,Authorization',
-                    'Access-Control-Allow-Methods' => 'GET, POST, PUT, DELETE, OPTIONS'
-                ]
-            );
-        }
     }
     public function uploadVerificationDocument(Request $request)
     {
