@@ -52,7 +52,7 @@ class ProvidersController extends Controller
         if($document)
         {
             $directory = 'verification_documents/';
-            $image = Storage::temporaryUrl($directory.$document->url, now()->addMinutes(10)); 
+            $image = Storage::url($directory.$document->url); 
             return response()->json($image);
         }
        
