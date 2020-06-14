@@ -37,6 +37,7 @@ Route::namespace('Api')->group(function () {
         Route::get('getAll', 'ProvidersController@getAll');
         Route::get('getByUid/{uid}', 'ProvidersController@getByUid');
         Route::get('getById/{id}', 'ProvidersController@getById');
+        Route::get('getFees', 'ProvidersController@getFees');
         Route::middleware('auth:api')->group(function(){
             Route::post('addFavorite/{providerId}', 'FavoriteProvidersController@add');
             Route::post('deleteFavorite/{providerId}', 'FavoriteProvidersController@delete');
@@ -48,6 +49,7 @@ Route::namespace('Api')->group(function () {
             Route::get('getByUserId/{userId}', 'ProvidersController@getByUserId');
 
             Route::post('verify/{providerId}', 'ProvidersController@verifyProvider');
+            Route::post('updateProviderInfo/{providerId}', 'ProvidersController@updateProviderInfo');
         });
     });
     Route::prefix('calendar')->group(function () {
@@ -68,12 +70,14 @@ Route::namespace('Api')->group(function () {
         });
     });
     Route::prefix('users')->group(function () {
-        
+        Route::post('tempInvoiceCreate', 'UsersController@tempInvoiceCreate');
         Route::middleware('auth:api')->group(function(){
             Route::get('getById/{id}', 'UsersController@getById');
             Route::get('getByUid/{uid}', 'UsersController@getByUid');
             Route::post('updateInfo', 'UsersController@updateInfo');
             Route::get('getAdditionalInfo/{userId}', 'UsersController@getAdditionalInfo');
+            Route::get('getBalance', 'UsersController@getBalance');
+            
 
         });
     });

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Fee;
 use App\Http\Controllers\Controller;
 use App\Provider;
 use App\ProviderCategory;
@@ -13,18 +14,18 @@ class ProvidersController extends Controller
 {
     public function getByCategoryId($categoryId)
     {
-
-        return Provider::with(['user', 'providerCategory', 'providerVerificationDocuments'])->where('provider_category_id', $categoryId)->get();
+        return ProviderCategory::find($categoryId)->providers()->with(['user', 'providerCategories', 'providerVerificationDocuments'])->get();
+        return ProviderCategory::with(['user', 'providerCategories', 'providerVerificationDocuments'])->where('provider_category_id', $categoryId)->get();
     }
     public function getByUserId($userId)
     {
 
-        return Provider::with(['user', 'providerCategory', 'providerVerificationDocuments', 'user.additionalInfo'])->where('user_id', $userId)->first();
+        return Provider::with(['user', 'providerCategories', 'providerVerificationDocuments', 'user.additionalInfo'])->where('user_id', $userId)->first();
     }
     public function getAll()
     {
 
-        return Provider::with(['user', 'providerCategory'])->get();
+        return Provider::with(['user', 'providerCategories'])->get();
     }
     public function getByUid($uid)
     {
@@ -34,7 +35,7 @@ class ProvidersController extends Controller
     }
     public function getById($id)
     {
-        return Provider::with(['user', 'providerVerificationDocuments', 'user.additionalInfo'])->where('id', $id)->first();
+        return Provider::with(['user', 'providerCategories','providerVerificationDocuments', 'user.additionalInfo'])->where('id', $id)->first();
     }
     public function verifyProvider($providerId)
     {
@@ -100,5 +101,28 @@ class ProvidersController extends Controller
             'Access-Control-Allow-Headers' => 'Content-Type, X-Auth-Token, Origin, Content-Type,Authorization',
             'Access-Control-Allow-Methods' => 'GET, POST, PUT, DELETE, OPTIONS'
         ]);
+    }
+    public function updateProviderInfo(Request $request, $providerId)
+    {
+        $request->validate(
+            [
+                'provider_categories' => 'required',
+                'per_minute_text_fee' => 'required',
+                'per_minute_call_fee' => 'required'
+            ]
+
+        );
+        $provider = Provider::find($providerId);
+        $provider->per_minute_text_fee = $request->input('per_minute_text_fee');
+        $provider->per_minute_call_fee = $request->input('per_minute_call_fee');
+        $provider->providerCategories()->sync($request->input('provider_categories'));
+        $provider->save();
+        return Provider::with(['user', 'providerCategories', 'providerVerificationDocuments', 'user.additionalInfo'])->where('id', $providerId)->first();
+
+
+    }
+    public function getFees()
+    {
+        return Fee::get();
     }
 }

@@ -23,12 +23,14 @@ class ProviderCategoriesController extends Controller
     {
         $request->validate(
             ['name'=> 'required',
+            'description'=>'required',
              'icon_name' => 'required']
         );
         $name = $request->input('name');
         $iconName = $request->input('icon_name');
         $category = new ProviderCategory();
         $category->name = $name;
+        $category->description = $request->input('description');
         $category->icon_name = $iconName;
         $category->save();
 
@@ -40,12 +42,14 @@ class ProviderCategoriesController extends Controller
             [
             'id' => 'required',
             'name'=> 'required',
+            'description'=>'required',
              'icon_name' => 'required']
         );
         $category = ProviderCategory::find($request->input('id'));
         $name = $request->input('name');
         $iconName = $request->input('icon_name');
         $category->name = $name;
+        $category->description = $request->input('description');
         $category->icon_name = $iconName;
         $category->save();
 

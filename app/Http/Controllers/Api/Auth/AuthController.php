@@ -64,7 +64,7 @@ class AuthController extends Controller
         $roleId = $request->input('role_id');
         $isProvider = $roleId == $this->accessManager->getRoleId('service_provider');
         if ($isProvider) {
-            $validations['provider_category_id'] = 'required';
+           // $validations['provider_category_id'] = 'required';
         }
         $request->validate($validations);
         $user = new User;
@@ -80,8 +80,8 @@ class AuthController extends Controller
         //$user->role_id = $this->accessManager->getRoleId('service_user');  
         if ($user->save() && $isProvider) {
             $provider = new Provider;
-            $provider->provider_category_id = $request->input('provider_category_id');
-            $provider->per_minute_text_fee = 1200;
+            //$provider->provider_category_id = $request->input('provider_category_id');
+            //$provider->per_minute_text_fee = 1200;
             $user->provider()->save($provider);
         }
 
@@ -141,11 +141,17 @@ class AuthController extends Controller
 
 
         $credentials = $request->only('username', 'password');
-
+        
         if (auth()->attempt(['phone' => $credentials['username'], 'password' => $credentials['password']])) {
 
             $user = User::where('phone', $credentials['username'])->first();
-            
+            if($user->phone_verified_at == null)
+            {
+                return  response()->json([
+                    'error' => 'not_verified', 'error_message' => 'user is not verified',
+                    'error_description' => 'User is not verified.'
+                ], 403);
+            }
             $role = $user->checkRole();
             $scopes = '';
             // grant scopes based on the role that we get previously
@@ -167,6 +173,7 @@ class AuthController extends Controller
             //var_dump($request->all());die;
             return Route::dispatch($tokenRequest);
         }
+        
         return response()->json([
             'error' => 'invalid_credentials', 'error_message' => 'The provided credentials are invalid.',
             'error_description' => 'The provided credentials are invalid.'

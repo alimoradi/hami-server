@@ -12,9 +12,9 @@ class Provider extends Model
     {
         return $this->belongsTo(User::class);
     }
-    public function providerCategory()
+    public function providerCategories()
     {
-        return $this->belongsTo(ProviderCategory::class);
+        return $this->belongsToMany(ProviderCategory::class);
     }
     public function availableHours()
     {
@@ -25,4 +25,5 @@ class Provider extends Model
         return $this->hasMany(ProviderVerificationDocument::class);
     }
     
+
 }
