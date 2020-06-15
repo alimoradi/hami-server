@@ -39,6 +39,7 @@ Route::namespace('Api')->group(function () {
         Route::get('getById/{id}', 'ProvidersController@getById');
         Route::get('getFees', 'ProvidersController@getFees');
         Route::middleware('auth:api')->group(function(){
+
             Route::post('addFavorite/{providerId}', 'FavoriteProvidersController@add');
             Route::post('deleteFavorite/{providerId}', 'FavoriteProvidersController@delete');
             Route::get('favorites', 'FavoriteProvidersController@index');
@@ -50,6 +51,12 @@ Route::namespace('Api')->group(function () {
 
             Route::post('verify/{providerId}', 'ProvidersController@verifyProvider');
             Route::post('updateProviderInfo/{providerId}', 'ProvidersController@updateProviderInfo');
+
+            Route::post('activitySwitchOn', 'ProvidersController@activitySwitchOn');
+            Route::post('activitySwitchOff', 'ProvidersController@activitySwitchOff');
+
+            Route::get('getActivitySwitch', 'ProvidersController@getActivitySwitch');
+            Route::get('stats', 'ProvidersController@providerStats');
         });
     });
     Route::prefix('calendar')->group(function () {
@@ -69,6 +76,12 @@ Route::namespace('Api')->group(function () {
             Route::post('sessionUpdate', 'SessionsController@notifySessionUpdate');
         });
     });
+    Route::middleware('auth:api')->group(function(){
+        Route::get('user', 'UsersController@me');
+
+    });
+    Route::get('stats', 'UsersController@stats');
+    Route::get('config', 'UsersController@config');
     Route::prefix('users')->group(function () {
         Route::post('tempInvoiceCreate', 'UsersController@tempInvoiceCreate');
         Route::middleware('auth:api')->group(function(){
@@ -77,6 +90,7 @@ Route::namespace('Api')->group(function () {
             Route::post('updateInfo', 'UsersController@updateInfo');
             Route::get('getAdditionalInfo/{userId}', 'UsersController@getAdditionalInfo');
             Route::get('getBalance', 'UsersController@getBalance');
+            Route::post('deposit', 'UsersController@deposit');
             
 
         });
@@ -123,10 +137,5 @@ Route::namespace('Api')->group(function () {
 
 
 
-    Route::middleware('auth:api')->get('user', function (Request $request) {
-        if (Gate::denies('see-user')) {
-            abort(403);
-        }
-        return auth()->user();
-    });
+    
 });

@@ -7,7 +7,9 @@ use App\Libraries\Notifications\MessageReceived;
 use App\Http\Controllers\Controller;
 use App\Invoice;
 use App\Provider;
+use App\ProviderCategory;
 use App\Session;
+use App\Topic;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -15,6 +17,10 @@ use Illuminate\Support\Facades\DB;
 
 class UsersController extends Controller
 {
+    public function me()
+    {
+        return User::with(['sessionSubscriptions', 'p2pSubscriptions', 'mustSubscriptions'])->find(auth()->user()->id);
+    }
     public function getById($id)
     {
 
@@ -68,9 +74,20 @@ class UsersController extends Controller
         $real = $spendable->where('is_final', true)->sum('amount');
         $spendable = $spendable->sum('amount');
 
-        return response()->json(['real' => $real, 'spendable'=>$spendable ]);
+        return response()->json(['real' => $real, 'spendable' => $spendable]);
     }
-
+    public function deposit(Request $request)
+    {
+        $amount = $request->input('amount');
+        $invoice = new Invoice();
+        $invoice->created_at = Carbon::now();
+        $invoice->is_final = true;
+        $invoice->is_pre_invoice = false;
+        $invoice->amount = $amount;
+        $invoice->user_id = auth()->user()->id;
+        $invoice->save();
+        return response()->json($invoice);
+    }
     public function tempInvoiceCreate()
     {
         return;
@@ -112,5 +129,54 @@ class UsersController extends Controller
                 $invoice->save();
             }
         }
+    }
+    public function config()
+    {
+        $providerPresTopic = Topic::where('type', 3)->first()->name;
+
+        $config = [
+            'provider_pres_topic' => $providerPresTopic
+        ];
+        return response()->json($config);
+    }
+    public function stats()
+    {
+        $onlineProviderCount = Provider::where('activity_switch', true)->count();
+        $totalProviderCount = Provider::count();
+        $inSessionProviderCount =  Provider::whereHas('sessions', function ($query) {
+            $query->where('started', '!=', null)
+                ->where('ended', null);
+        })->count();
+        $cats = ProviderCategory::all();
+        $categoryProviderStats = [];
+        foreach ($cats as $cat) {
+            $catId = $cat->id;
+            $onlineCatProviderCount = Provider::where('activity_switch', true)
+                ->whereHas('providerCategories', function ($query) use ($catId) {
+                    $query->where('provider_categories.id', $catId);
+                })->count();
+            $totalCatProviderCount = Provider::whereHas('providerCategories', function ($query) use ($catId) {
+                $query->where('provider_categories.id', $catId);
+            })->count();
+            $inSessionCatProviderCount =  Provider::whereHas('sessions', function ($query) {
+                $query->where('started', '!=', null)
+                    ->where('ended', null);
+            })->whereHas('providerCategories', function ($query) use ($catId) {
+                $query->where('provider_categories.id', $catId);
+            })->count();
+            $categoryProviderStats[] = [
+                'category_id' => $catId,
+                'online_provider_count' => $onlineCatProviderCount,
+                'total_provider_count' => $totalCatProviderCount,
+                'in_session_provider_count' => $inSessionCatProviderCount
+            ];
+        }
+        $stats = [
+            'online_provider_count' => $onlineProviderCount,
+            'total_provider_count' => $totalProviderCount,
+            'in_session_provider_count' => $inSessionProviderCount,
+            'category_stats'=>$categoryProviderStats
+        ];
+        return response()->json($stats);
     }
 }

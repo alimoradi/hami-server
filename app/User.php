@@ -49,6 +49,32 @@ class User extends Authenticatable
     {
         return $this->hasOne(AdditionalInfo::class);
     }
+    public function p2pSubscriptions()
+    {
+        return $this->hasMany(Subscription::class)
+        ->where('subscribed_at', '!=', null)
+        ->where('unsubscribed_at', null)
+        ->whereHas('topic', function ($query)  {
+            $query->where('type', '=', 1);
+        })->with(['topic', 'topic.subscribers']);
+    }
+    public function sessionSubscriptions()
+    {
+        return $this->hasMany(Subscription::class)
+        ->where('subscribed_at', '!=', null)
+        ->where('unsubscribed_at', null)
+        ->whereHas('topic', function ($query)  {
+            $query->where('type', '=', 2);
+        })->with(['topic', 'topic.subscribers']);
+    }
+    public function mustSubscriptions()
+    {
+        return $this->hasMany(Subscription::class)
+        ->where('subscribed_at', null)
+        ->where('unsubscribed_at', null)
+        ->where('must_subscribe', true)
+        ->with(['topic']);
+    }
     /**
      * The attributes that are mass assignable.
      *

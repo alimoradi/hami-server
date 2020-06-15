@@ -24,6 +24,10 @@ class Provider extends Model
     {
         return $this->hasMany(ProviderVerificationDocument::class);
     }
+    public function sessions()
+    {
+        return $this->hasMany(Session::class);
+    }
     
 
 }

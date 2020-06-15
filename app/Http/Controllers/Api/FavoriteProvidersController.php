@@ -31,6 +31,6 @@ class FavoriteProvidersController extends Controller
     }
     public function index()
     {
-        return FavoriteProvider::with(['provider','provider.user', 'provider.providerCategory'])->where('user_id', auth()->user()->id)->get();
+        return FavoriteProvider::with(['provider','provider.user', 'provider.providerCategories'])->where('user_id', auth()->user()->id)->get();
     }
 }

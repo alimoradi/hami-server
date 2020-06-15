@@ -125,4 +125,39 @@ class ProvidersController extends Controller
     {
         return Fee::get();
     }
+    public function activitySwitchOn()
+    {
+        $provider = Provider::where('user_id', auth()->user()->id)->first();
+        $provider->activity_switch = true;
+        $provider->save();
+        return response()->json(['success'=> true] );
+    }
+    public function providerStats()
+    {
+        $onlineCount = Provider::where('activity_switch', true)->count();
+        $totalCount = Provider::count();
+        $inSessionCount =  Provider::whereHas('sessions', function ($query) {
+            $query->where('started', '!=' , null)
+            ->where('ended', null);
+        })->count();
+        $stats = [
+            'online_count' => $onlineCount,
+            'total_count' => $totalCount,
+            'in_session_count' => $inSessionCount
+        ];
+        return response()->json($stats);
+    }
+    public function activitySwitchOff()
+    {
+        $provider = Provider::where('user_id', auth()->user()->id)->first();
+        $provider->activity_switch = false;
+        $provider->save();
+        return response()->json(['success'=> true] );
+    }
+    public function getActivitySwitch()
+    {
+        $provider = Provider::where('user_id', auth()->user()->id)->first();
+        
+        return response()->json($provider->activity_switch );
+    }
 }
