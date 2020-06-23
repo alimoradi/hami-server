@@ -119,7 +119,11 @@ Route::namespace('Api')->group(function () {
             Route::get('providerRequestedSessions', 'SessionsController@providerRequestedSessions');
             Route::get('getPresentAndFutureSessions', 'SessionsController@getPresentAndFutureSessions');
 
+            Route::get('getProviderPresentAndFutureSessions/{providerId}', 'SessionsController@getProviderPresentAndFutureSessions');
+
             Route::get('getPastSessions', 'SessionsController@getPastSessions');
+
+            Route::get('getUserSessions', 'SessionsController@getUserSessions');
 
         });
     });

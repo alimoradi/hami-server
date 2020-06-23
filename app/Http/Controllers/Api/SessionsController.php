@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Invoice;
 use App\Libraries\Notifications\SessionUpdated;
 use App\Provider;
 use App\Session;
@@ -18,7 +19,9 @@ class SessionsController extends Controller
             ['reserved_from'=> 'required',
              'reserved_to' => 'required',
              'provider_id' => 'required',
-             'chat_topic_name' => 'required']
+             'chat_topic_name' => 'required',
+             'duration' => 'required',
+             'type' => 'required']
         );
         $providerId = $request->input('provider_id');
         $session = new Session();
@@ -27,10 +30,35 @@ class SessionsController extends Controller
         $session->chat_topic_name = $request->input('chat_topic_name');
         $session->reserved_from = Carbon::parse($request->input('reserved_from'));
         $session->reserved_to = Carbon::parse($request->input('reserved_to'));
-        $session->per_minute_text_fee = Provider::find($providerId)->per_minute_text_fee;
-        $session->save();
+        $session->type = $request->input('type');
+        if($session->type == 1)
+        {
+            $session->per_minute_fee = Provider::find($providerId)->per_minute_text_fee;
 
-        return Session::with(['provider','provider.user', 'user', 'provider.providerCategory'])->find($session->id);
+        }
+        else
+        {
+            $session->per_minute_fee = Provider::find($providerId)->per_minute_call_fee;
+
+        }
+
+        $session->duration = $request->input('duration');
+
+        
+        $invoice = new Invoice();
+        $invoice->created_at = Carbon::now();
+        $invoice->is_final = false;
+        $invoice->is_pre_invoice = true;
+        $invoice->amount = $session->per_minute_fee * $session->duration * -1;
+        $invoice->user_id = auth()->user()->id;
+        $invoice->related_type =  1;
+
+        $session->save();
+        $session->invoice()->save( $invoice);
+        //return response()->json($invoice);
+        //$session->save();
+        //$session->push();
+        return Session::with(['provider','provider.user', 'user', 'provider.providerCategories'])->find($session->id);
 
     }
     public function accept($sessionId)
@@ -38,26 +66,26 @@ class SessionsController extends Controller
         $session = Session::find($sessionId);
         $session->accepted = Carbon::now();
         $session->save();
-        return Session::with(['provider','provider.user', 'user', 'provider.providerCategory'])->find($session->id);
+        return Session::with(['provider','provider.user', 'user', 'provider.providerCategories'])->find($session->id);
     }
     public function start($sessionId)
     {
         $session = Session::find($sessionId);
         $session->started = Carbon::now();
         $session->save();
-        return Session::with(['provider','provider.user', 'user', 'provider.providerCategory'])->find($session->id);
+        return Session::with(['provider','provider.user', 'user', 'provider.providerCategories'])->find($session->id);
     }
     public function end($sessionId)
     {
         $session = Session::find($sessionId);
         $session->ended = Carbon::now();
         $session->save();
-        return Session::with(['provider','provider.user', 'user', 'provider.providerCategory'])->find($session->id);
+        return Session::with(['provider','provider.user', 'user', 'provider.providerCategories'])->find($session->id);
     }
     public function providerActiveSessions()
     {
         
-        return Session::with(['provider','provider.user', 'user', 'provider.providerCategory'])
+        return Session::with(['provider','provider.user', 'user', 'provider.providerCategories'])
         ->whereHas('provider.user' , function($query){
                 $query->where('id', '=', auth()->user()->id);
         })
@@ -68,16 +96,23 @@ class SessionsController extends Controller
     }
     public function userActiveSessions()
     {
-        return Session::with(['provider','provider.user', 'user', 'provider.providerCategory'])
+        return Session::with(['provider','provider.user', 'user', 'provider.providerCategories'])
             ->where('user_id' , auth()->user()->id)
             ->where('started', '!=' , null)
             ->where('ended', null)
             ->orderBy('started', 'DESC')
             ->get();
     }
+    public function getUserSessions()
+    {
+        $sessions = Session::with(['provider','provider.user', 'user', 'provider.providerCategories'])
+        ->where('user_id' , auth()->user()->id);
+       
+        return $sessions->get();
+    }
     public function getPresentAndFutureSessions()
     {
-        $sessions = Session::with(['provider','provider.user', 'user', 'provider.providerCategory'])
+        $sessions = Session::with(['provider','provider.user', 'user', 'provider.providerCategories'])
         ->where('ended', null)
         ->orderBy('started', 'DESC');
         if(auth()->user()->role_id == 2)
@@ -92,9 +127,17 @@ class SessionsController extends Controller
         }
         return $sessions->get();
     }
+    public function getProviderPresentAndFutureSessions($providerId)
+    {
+        $sessions = Session::where('ended', null)
+        ->orderBy('started', 'DESC')
+        ->where('provider_id', $providerId);
+        
+        return $sessions->get();
+    }
     public function getPastSessions()
     {
-        $sessions = Session::with(['provider','provider.user', 'user', 'provider.providerCategory'])
+        $sessions = Session::with(['provider','provider.user', 'user', 'provider.providerCategories'])
         ->where('ended','!=', null)
         ->orderBy('started', 'DESC');
         if(auth()->user()->role_id == 2)
@@ -134,7 +177,7 @@ class SessionsController extends Controller
     public function providerEndedSessions()
     {
         
-        return Session::with(['provider','provider.user', 'user', 'provider.providerCategory'])
+        return Session::with(['provider','provider.user', 'user', 'provider.providerCategories'])
         ->whereHas('provider.user' , function($query){
             $query->where('id', '=', auth()->user()->id);
         })
@@ -144,7 +187,7 @@ class SessionsController extends Controller
     }
     public function userEndedSessions()
     {
-        return Session::with(['provider','provider.user', 'user', 'provider.providerCategory'])
+        return Session::with(['provider','provider.user', 'user', 'provider.providerCategories'])
             ->where('user_id' , auth()->user()->id)
             ->where('ended', '!=' , null)
             ->orderBy('started', 'DESC')
@@ -153,7 +196,7 @@ class SessionsController extends Controller
     public function providerRequestedSessions()
     {
         
-        return Session::with(['provider','provider.user', 'user', 'provider.providerCategory'])
+        return Session::with(['provider','provider.user', 'user', 'provider.providerCategories'])
         ->whereHas('provider' , function($query){
             $query->whereHas('user', function($query){
                 $query->where('id', '=', auth()->user()->id);
@@ -166,7 +209,7 @@ class SessionsController extends Controller
     }
     public function userRequestedSessions()
     {
-        return Session::with(['provider','provider.user', 'user', 'provider.providerCategory'])
+        return Session::with(['provider','provider.user', 'user', 'provider.providerCategories'])
             ->where('user_id' , auth()->user()->id)
             ->where('started' , null)
             ->orderBy('started', 'DESC')

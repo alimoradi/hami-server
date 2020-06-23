@@ -71,10 +71,10 @@ class UsersController extends Controller
         $spendable = $query->where(function ($q) {
             $q->where('amount', '>', 0)->where('is_final', true);
         })->orWhere('amount', '<', 0);
+        
+        $spendableAmount = $spendable->sum('amount');
         $real = $spendable->where('is_final', true)->sum('amount');
-        $spendable = $spendable->sum('amount');
-
-        return response()->json(['real' => $real, 'spendable' => $spendable]);
+        return response()->json(['real' => $real, 'spendable' => $spendableAmount]);
     }
     public function deposit(Request $request)
     {
@@ -82,9 +82,11 @@ class UsersController extends Controller
         $invoice = new Invoice();
         $invoice->created_at = Carbon::now();
         $invoice->is_final = true;
+        $invoice->related_type = 2;
         $invoice->is_pre_invoice = false;
         $invoice->amount = $amount;
         $invoice->user_id = auth()->user()->id;
+        $invoice->related_id = 0;
         $invoice->save();
         return response()->json($invoice);
     }

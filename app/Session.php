@@ -14,4 +14,8 @@ class Session extends Model
     {
         return $this->belongsTo(Provider::class);
     }
+    public function invoice()
+    {
+        return $this->hasOne(Invoice::class, 'related_id')->where('related_type', 1);
+    }
 }
