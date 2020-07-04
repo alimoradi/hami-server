@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Provider extends Model
 {
+    protected $appends = ['status'];
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -28,6 +29,21 @@ class Provider extends Model
     {
         return $this->hasMany(Session::class);
     }
-    
+    public function getStatusAttribute()
+    {
+        $status = 0;
+        $openSessionsCount = $this->sessions()
+            ->where('started', "!=", null)
+            ->where('ended', null)->count();
+        $activitySwitch = $this->activity_switch;
+        if($activitySwitch)
+            $status = 1;
+        if($openSessionsCount > 0)
+        {
+            $status = 2;
+        }
+        return $status;
+    }
+
 
 }
