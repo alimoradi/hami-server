@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Provider;
 use App\ProviderCategory;
 use App\ProviderVerificationDocument;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -159,5 +160,19 @@ class ProvidersController extends Controller
         $provider = Provider::where('user_id', auth()->user()->id)->first();
         
         return response()->json($provider->activity_switch );
+    }
+    public function getRandomAvatars($categoryId = null, Request $request)
+    {
+        $avatars = [];
+        $query =  $query = User::whereHas('provider')->where('avatar', '!=', null);
+        if($categoryId)
+        {
+            $query = $query->whereHas('provider.providerCategories', function ($query) use($categoryId) {
+                $query->where('provider_categories.id',$categoryId);
+            });
+        }
+        $query = $query->inRandomOrder()->limit(7)->pluck('avatar');
+        return response()->json($query->toArray() );
+       
     }
 }

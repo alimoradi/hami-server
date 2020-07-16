@@ -38,6 +38,7 @@ Route::namespace('Api')->group(function () {
         Route::get('getByUid/{uid}', 'ProvidersController@getByUid');
         Route::get('getById/{id}', 'ProvidersController@getById');
         Route::get('getFees', 'ProvidersController@getFees');
+        Route::get('getRandomAvatars/{categoryId?}', 'ProvidersController@getRandomAvatars');
         Route::middleware('auth:api')->group(function(){
 
             Route::post('addFavorite/{providerId}', 'FavoriteProvidersController@add');
