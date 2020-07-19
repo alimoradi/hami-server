@@ -109,14 +109,31 @@ class ProvidersController extends Controller
             [
                 'provider_categories' => 'required',
                 'per_minute_text_fee' => 'required',
-                'per_minute_call_fee' => 'required'
+                'per_minute_call_fee' => 'required',
+                'education_degree' => 'required'
             ]
 
         );
         $provider = Provider::find($providerId);
         $provider->per_minute_text_fee = $request->input('per_minute_text_fee');
         $provider->per_minute_call_fee = $request->input('per_minute_call_fee');
+        $provider->education_degree = $request->input('education_degree');
         $provider->providerCategories()->sync($request->input('provider_categories'));
+        $provider->save();
+        return Provider::with(['user', 'providerCategories', 'providerVerificationDocuments', 'user.additionalInfo'])->where('id', $providerId)->first();
+
+
+    }
+    public function updateAboutMe(Request $request, $providerId)
+    {
+        $request->validate(
+            [
+                'about_me' => 'required'
+            ]
+
+        );
+        $provider = Provider::find($providerId);
+        $provider->about_me = $request->input('about_me');
         $provider->save();
         return Provider::with(['user', 'providerCategories', 'providerVerificationDocuments', 'user.additionalInfo'])->where('id', $providerId)->first();
 

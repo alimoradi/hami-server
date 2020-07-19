@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Provider extends Model
 {
-    protected $appends = ['status'];
+    protected $appends = ['status', 'ended_sessions_count', 'mean_score'];
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -36,14 +36,35 @@ class Provider extends Model
             ->where('started', "!=", null)
             ->where('ended', null)->count();
         $activitySwitch = $this->activity_switch;
-        if($activitySwitch)
+        if ($activitySwitch)
             $status = 1;
-        if($openSessionsCount > 0)
-        {
+        if ($openSessionsCount > 0) {
             $status = 2;
         }
         return $status;
     }
+    public function getEndedSessionsCountAttribute()
+    {
 
+        $endedSessionsCount = $this->sessions()
+            ->where('started', "!=", null)
+            ->where('ended', "!=", null)->count();
+        return $endedSessionsCount;
+    }
+    public function getMeanScoreAttribute()
+    {
+        $mean = 0;
+        if ($this->ended_sessions_count > 0) {
+            $scores = $this->sessions()
+                ->where('started', "!=", null)
+                ->where('ended', "!=", null)->pluck('score')->toArray();
+            $sum = 0;
+            foreach ($scores as $score) {
+                $sum += $score;
+            }
+            $mean = $sum / $this->ended_sessions_count;
+        }
 
+        return $mean;
+    }
 }

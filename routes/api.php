@@ -53,6 +53,8 @@ Route::namespace('Api')->group(function () {
             Route::post('verify/{providerId}', 'ProvidersController@verifyProvider');
             Route::post('updateProviderInfo/{providerId}', 'ProvidersController@updateProviderInfo');
 
+            Route::post('updateAboutMe/{providerId}', 'ProvidersController@updateAboutMe');
+
             Route::post('activitySwitchOn', 'ProvidersController@activitySwitchOn');
             Route::post('activitySwitchOff', 'ProvidersController@activitySwitchOff');
 
@@ -119,6 +121,7 @@ Route::namespace('Api')->group(function () {
             Route::get('providerEndedSessions', 'SessionsController@providerEndedSessions');
             Route::get('providerRequestedSessions', 'SessionsController@providerRequestedSessions');
             Route::get('getPresentAndFutureSessions', 'SessionsController@getPresentAndFutureSessions');
+            Route::post('updateScore/{sessionId}', 'SessionsController@updateScore');
 
             Route::get('getProviderPresentAndFutureSessions/{providerId}', 'SessionsController@getProviderPresentAndFutureSessions');
 
