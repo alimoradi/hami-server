@@ -22,7 +22,8 @@ class SessionsController extends Controller
                 'provider_id' => 'required',
                 'chat_topic_name' => 'required',
                 'duration' => 'required',
-                'type' => 'required'
+                'type' => 'required',
+                'timing_type' => 'required'
             ]
         );
         $providerId = $request->input('provider_id');
@@ -33,6 +34,7 @@ class SessionsController extends Controller
         $session->reserved_from = Carbon::parse($request->input('reserved_from'));
         $session->reserved_to = Carbon::parse($request->input('reserved_to'));
         $session->type = $request->input('type');
+        $session->timing_type = $request->input('timing_type');
         if ($session->type == 1) {
             $session->per_minute_fee = Provider::find($providerId)->per_minute_text_fee;
         } else {
