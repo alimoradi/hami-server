@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\AdditionalInfo;
 use App\Libraries\Notifications\MessageReceived;
 use App\Http\Controllers\Controller;
+use App\Interfaces\VoiceCallMaker;
 use App\Invoice;
+use App\Libraries\Notifications\IncomingCall;
 use App\Provider;
 use App\ProviderCategory;
 use App\Session;
@@ -38,7 +40,7 @@ class UsersController extends Controller
         $recipientUserId = $request->input('recipient_user_id');
         $topic = $request->input('topic');
         $user = User::where('id', $recipientUserId)->first();
-        $user->notify(new MessageReceived(json_encode(auth()->user()), $topic));
+        return $user->notify(new MessageReceived(json_encode(auth()->user()), $topic));
         return response()->json(['success' => true]);
     }
     public function updateInfo(Request $request)
@@ -180,5 +182,34 @@ class UsersController extends Controller
             'category_stats'=>$categoryProviderStats
         ];
         return response()->json($stats);
+    }
+    public function makeCall(Request $request, VoiceCallMaker $callMaker)
+    {
+
+
+        $request->validate(
+            [
+                'receptor_user_id' => 'required',
+                'max_duration' => 'required'
+            ]
+        );
+        $callerUsername = auth()->user()->phone;
+        $receptor = User::find($request->input('receptor_user_id'));
+        $receptorUsername = $receptor->phone;
+        $maxDuration = $request->input('max_duration');
+        $call = $callMaker->createCall($callerUsername, $receptorUsername, $maxDuration);
+       
+
+        if($call)
+        {
+            $callId = $call->id;
+            $callerAccessToken = $call->caller->accessToken;
+            $receptorAccessToken = $call->receptor->accessToken;;
+            $receptor->notify(new IncomingCall($receptorAccessToken, $callId));
+            return response()->json(['id' =>$callId, 'access_token' => $callerAccessToken ]);
+        }
+        return response()->json('',404);
+        
+
     }
 }

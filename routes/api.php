@@ -79,8 +79,10 @@ Route::namespace('Api')->group(function () {
             Route::post('sessionUpdate', 'SessionsController@notifySessionUpdate');
         });
     });
+    
     Route::middleware('auth:api')->group(function(){
         Route::get('user', 'UsersController@me');
+        Route::post('makeCall', 'UsersController@makeCall');
 
     });
     Route::get('stats', 'UsersController@stats');
