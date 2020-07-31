@@ -14,12 +14,16 @@ class IncomingCall extends Notification
    
     private $accessToken;
     private $callId;
+    private $caller;
+    private $maxDuration;
     private $notificationCode = 0;
-     function __construct( $accessToken, $callId)
+     function __construct( $accessToken, $callId, $caller, $maxDuration)
     {
         
         $this->accessToken = $accessToken;
         $this->callId = $callId;
+        $this->caller = $caller;
+        $this->maxDuration = $maxDuration;
     }   
     public function via($notifiable)
     {
@@ -30,7 +34,7 @@ class IncomingCall extends Notification
     {
         return FcmMessage::create()
             ->setName('IncomingCall')
-            ->setData([ 'notification_code' => '2', 'access_token'=> $this->accessToken, 'call_id' =>$this->callId])
+            ->setData([ 'notification_code' => '2', 'access_token'=> $this->accessToken, 'call_id' =>$this->callId, 'caller'=> $this->caller, 'max_duration' => $this->maxDuration])
             ->setNotification(\NotificationChannels\Fcm\Resources\Notification::create()
                 ->setTitle('تماس جدید')
                 ->setBody('شما یک تماس دریافتی دارید.')

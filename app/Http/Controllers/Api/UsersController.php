@@ -205,7 +205,7 @@ class UsersController extends Controller
             $callId = $call->id;
             $callerAccessToken = $call->caller->accessToken;
             $receptorAccessToken = $call->receptor->accessToken;;
-            $receptor->notify(new IncomingCall($receptorAccessToken, $callId));
+            $receptor->notify(new IncomingCall($receptorAccessToken, $callId,json_encode( auth()->user()), strval($maxDuration)));
             return response()->json(['id' =>$callId, 'access_token' => $callerAccessToken ]);
         }
         return response()->json('',404);
