@@ -70,9 +70,12 @@ class UsersController extends Controller
     {
         $userId = auth()->user()->id;
         $query = Invoice::where('user_id', $userId);
-        $spendable = $query->where(function ($q) {
-            $q->where('amount', '>', 0)->where('is_final', true);
-        })->orWhere('amount', '<', 0);
+        $spendable = $query->where(function($j){
+            $j->where(function ($q) {
+                $q->where('amount', '>', 0)->where('is_final', true);
+            })->orWhere('amount', '<', 0);
+        })->where('deleted', false);
+        
         
         $spendableAmount = $spendable->sum('amount');
         $real = $spendable->where('is_final', true)->sum('amount');

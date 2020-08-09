@@ -18,4 +18,9 @@ class Session extends Model
     {
         return $this->hasOne(Invoice::class, 'related_id')->where('related_type', 1);
     }
+    public  const SESSION_TYPE_TEXT = 1;
+    public  const SESSION_TYPE_CALL = 2;
+    public  const SESSION_TIMING_TYPE_IMMEDIATE = 1;
+    public  const SESSION_TIMING_TYPE_RESERVATION = 0;
+    
 }

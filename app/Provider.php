@@ -67,4 +67,15 @@ class Provider extends Model
 
         return $mean;
     }
+
+    public  const PROVIDER_STATUS_OFFLINE = 0;
+    public  const PROIDER_STATUS_ONLINE = 1;
+    public const PROVIDER_STATUS_IN_SESSION = 3;
+    public const PROVIDER_STATUS_NA = 3;
+    public const EDUCATION_DEGREE_HIGH_SCHOOL_DIPLOMA = 1;
+    public  const EDUCATION_DEGREE_BACHELORS = 2;
+    public  const EDUCATION_DEGREE_MASTERS = 3;
+    public  const EDUCATION_DEGREE_PHD = 4;
+    
+   
 }

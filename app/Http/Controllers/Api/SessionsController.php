@@ -78,6 +78,11 @@ class SessionsController extends Controller
         $session = Session::find($sessionId);
         $session->ended = Carbon::now();
         $session->save();
+        if($session->started == null)
+        {
+            $session->invoice->deleted = true;
+            $session->invoice->save();
+        }
         return Session::with(['provider', 'provider.user', 'user', 'provider.providerCategories'])->find($session->id);
     }
     public function providerActiveSessions()
@@ -101,13 +106,24 @@ class SessionsController extends Controller
             ->orderBy('started', 'DESC')
             ->get();
     }
-    public function getUserSessions()
+    public function getSessions()
     {
-        $sessions = Session::with(['provider', 'provider.user', 'user', 'provider.providerCategories'])
-            ->where('user_id', auth()->user()->id)
-            ->orderBy('created_at', 'DESC');
+        $role = auth()->user()->checkRole();
+        $sessions = null;
+        if ($role == 'service_user') {
+            $sessions = Session::with(['provider', 'provider.user', 'user', 'provider.providerCategories'])
+                ->where('user_id', auth()->user()->id)
+                ->orderBy('created_at', 'DESC');
+        } else if ($role == 'service_provider') {
+            $sessions = Session::with(['provider', 'provider.user', 'user', 'provider.providerCategories'])
+                ->whereHas('provider.user', function ($query) {
+                    $query->where('id', '=', auth()->user()->id);
+                })
+                ->orderBy('created_at', 'DESC');
+        }
         return $sessions->get();
     }
+
     public function getPresentAndFutureSessions()
     {
         $sessions = Session::with(['provider', 'provider.user', 'user', 'provider.providerCategories'])
@@ -182,18 +198,83 @@ class SessionsController extends Controller
             ->orderBy('started', 'DESC')
             ->get();
     }
-    public function providerRequestedSessions()
+    public function getActiveRequests()
     {
-
-        return Session::with(['provider', 'provider.user', 'user', 'provider.providerCategories'])
-            ->whereHas('provider', function ($query) {
-                $query->whereHas('user', function ($query) {
-                    $query->where('id', '=', auth()->user()->id);
+        $role = auth()->user()->checkRole();
+        $sessionQuery = "";
+        if ($role == 'service_user') {
+            $sessionQuery = Session::with(['provider', 'provider.user', 'user', 'provider.providerCategories'])
+                ->where('user_id', auth()->user()->id);
+        } else if ($role == 'service_provider') {
+            $sessionQuery = Session::with(['provider', 'provider.user', 'user', 'provider.providerCategories'])
+                ->whereHas('provider', function ($query) {
+                    $query->whereHas('user', function ($query) {
+                        $query->where('id', '=', auth()->user()->id);
+                    });
                 });
-            })
+        }
+        return $sessionQuery
             ->where('started', null)
-            ->orderBy('started', 'DESC')
+            ->where('ended', null)
+            ->where('accepted', null)
+            ->orderBy('created_at', 'DESC')
             ->get();
+    }
+    public function checkRequestEligibility(Request $request)
+    {
+        
+        $request->validate(
+            [
+                'provider_id' => 'required',
+                'date_from' => 'required',
+                'date_to' => 'required',
+                'duration' => 'required',
+                'type' => 'required',
+                'timing_type' => 'required'
+            ]
+        );
+        
+        $timingType = $request->input('timing_type');
+        $dateFrom = Carbon::parse($request->input('date_from'));
+        $dateTo = Carbon::parse($request->input('date_to'));
+        $duration = $request->input('duration');
+        $type = $request->input('typer');
+        $providerId = $request->input('provider_id');
+        
+        $provider = Provider::find($providerId);
+        if (
+            $timingType == Session::SESSION_TIMING_TYPE_IMMEDIATE
+            && $provider->status != Provider::PROIDER_STATUS_ONLINE
+        ) {
+            return response()->json(['error' => 'provider not online', 'error_code' => 101], 409);
+        }
+        $confilictingProviderSessionsCount = Session::where('provider_id', $providerId)
+            ->where('accepted', '!=', null)
+            ->where(function ($q) use ($dateFrom, $dateTo) {
+                $q->where(function ($p) use ($dateFrom, $dateTo) {
+                    $p->where('reserved_from', '>=', $dateFrom)->where('reserved_from', '<=', $dateTo);
+                })->orWhere(function ($r) use ($dateFrom, $dateTo) {
+                    $r->where('reserved_from', '<', $dateFrom)->where('reserved_to', '>', $dateFrom);
+                });
+            })->count();
+        if ($confilictingProviderSessionsCount > 0) {
+            return response()->json(['error' => 'provider sessions conflict', 'error_code' => 102], 409);
+        }
+        $conflictingUserSessionsCount = Session::where('user_id', auth()->user()->id)
+        ->where(function($j) use($providerId){
+            $j->where('provider_id', '!=', $providerId)->orWhere('accepted', null);
+        })->where('ended', null)        
+        ->where(function ($q) use ($dateFrom, $dateTo) {
+            $q->where(function ($p) use ($dateFrom, $dateTo) {
+                $p->where('reserved_from', '>=', $dateFrom)->where('reserved_from', '<=', $dateTo);
+            })->orWhere(function ($r) use ($dateFrom, $dateTo) {
+                $r->where('reserved_from', '<', $dateFrom)->where('reserved_to', '>', $dateFrom);
+            });
+        })->count();
+        if ($conflictingUserSessionsCount > 0) {
+            return response()->json(['error' => 'User sessions conflict', 'error_code' => 103], 409);
+        }
+        return response()->json(['success' => true]);
     }
     public function userRequestedSessions()
     {
@@ -225,7 +306,5 @@ class SessionsController extends Controller
         $session->score = $request->input('score');
         $session->save();
         return response()->json(['success' => true]);
-
-
     }
 }

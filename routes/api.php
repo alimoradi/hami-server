@@ -129,7 +129,9 @@ Route::namespace('Api')->group(function () {
 
             Route::get('getPastSessions', 'SessionsController@getPastSessions');
 
-            Route::get('getUserSessions', 'SessionsController@getUserSessions');
+            Route::get('getSessions', 'SessionsController@getSessions');
+            Route::get('getActiveRequests', 'SessionsController@getActiveRequests');
+            Route::post('checkRequestEligibility', 'SessionsController@checkRequestEligibility');
 
         });
     });
