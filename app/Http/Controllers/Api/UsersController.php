@@ -11,6 +11,7 @@ use App\Libraries\Notifications\IncomingCall;
 use App\Provider;
 use App\ProviderCategory;
 use App\Session;
+use App\Subscription;
 use App\Topic;
 use App\User;
 use Carbon\Carbon;
@@ -84,15 +85,7 @@ class UsersController extends Controller
     public function deposit(Request $request)
     {
         $amount = $request->input('amount');
-        $invoice = new Invoice();
-        $invoice->created_at = Carbon::now();
-        $invoice->is_final = true;
-        $invoice->related_type = 2;
-        $invoice->is_pre_invoice = false;
-        $invoice->amount = $amount;
-        $invoice->user_id = auth()->user()->id;
-        $invoice->related_id = 0;
-        $invoice->save();
+        $invoice = auth()->user()->deposit($amount);
         return response()->json($invoice);
     }
     public function tempInvoiceCreate()
@@ -213,6 +206,32 @@ class UsersController extends Controller
         }
         return response()->json('',404);
         
+
+    }
+    public function getPeers()
+    {
+        return auth()->user()->p2pPeers();
+    }
+    public function getDiscounts()
+    {
+        return auth()->user()->discounts()->where('activated', true)->get();
+    }
+    public function useDiscount(Request $request, $discountId)
+    {
+
+        $discount = auth()->user()->discounts()
+            ->where('id', $discountId)
+            ->where('activated', true)
+            ->where('expired', false)->first();
+        if($discount)
+        {
+            $invoice = auth()->user()->deposit($discount->value);
+            $discount->expired = true;
+            $discount->expired_at = Carbon::now();
+            $discount->save();
+            return response()->json($invoice);
+        }
+        return response()->json('',404);
 
     }
 }

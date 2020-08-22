@@ -7,6 +7,7 @@ use App\Invoice;
 use App\Libraries\Notifications\SessionUpdated;
 use App\Provider;
 use App\Session;
+use App\Topic;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -64,6 +65,7 @@ class SessionsController extends Controller
         $session = Session::find($sessionId);
         $session->accepted = Carbon::now();
         $session->save();
+        $session->subscribeToEachOther();
         return Session::with(['provider', 'provider.user', 'user', 'provider.providerCategories'])->find($session->id);
     }
     public function start($sessionId)
@@ -71,6 +73,14 @@ class SessionsController extends Controller
         $session = Session::find($sessionId);
         $session->started = Carbon::now();
         $session->save();
+        if (Session::where('provider_id', $session->provider->id)
+            ->where('user_id', $session->user->id)
+            ->where('accepted', '!=', null)
+            ->where('started', null)
+            ->where('ended', null)->count() == 0
+        ) {
+            $session->unsubscribeFromEachOther();
+        }
         return Session::with(['provider', 'provider.user', 'user', 'provider.providerCategories'])->find($session->id);
     }
     public function end($sessionId)
@@ -78,8 +88,18 @@ class SessionsController extends Controller
         $session = Session::find($sessionId);
         $session->ended = Carbon::now();
         $session->save();
-        if($session->started == null)
-        {
+        $session = Session::find($sessionId);
+        $session->started = Carbon::now();
+        $session->save();
+        if (Session::where('provider_id', $session->provider->id)
+            ->where('user_id', $session->user->id)
+            ->where('accepted', '!=', null)
+            ->where('started', null)
+            ->where('ended', null)->count() == 0
+        ) {
+            $session->unsubscribeFromEachOther();
+        }
+        if ($session->started == null) {
             $session->invoice->deleted = true;
             $session->invoice->save();
         }
@@ -222,7 +242,7 @@ class SessionsController extends Controller
     }
     public function checkRequestEligibility(Request $request)
     {
-        
+
         $request->validate(
             [
                 'provider_id' => 'required',
@@ -233,14 +253,14 @@ class SessionsController extends Controller
                 'timing_type' => 'required'
             ]
         );
-        
+
         $timingType = $request->input('timing_type');
         $dateFrom = Carbon::parse($request->input('date_from'));
         $dateTo = Carbon::parse($request->input('date_to'));
         $duration = $request->input('duration');
         $type = $request->input('typer');
         $providerId = $request->input('provider_id');
-        
+
         $provider = Provider::find($providerId);
         if (
             $timingType == Session::SESSION_TIMING_TYPE_IMMEDIATE
@@ -261,16 +281,16 @@ class SessionsController extends Controller
             return response()->json(['error' => 'provider sessions conflict', 'error_code' => 102], 409);
         }
         $conflictingUserSessionsCount = Session::where('user_id', auth()->user()->id)
-        ->where(function($j) use($providerId){
-            $j->where('provider_id', '!=', $providerId)->orWhere('accepted', null);
-        })->where('ended', null)        
-        ->where(function ($q) use ($dateFrom, $dateTo) {
-            $q->where(function ($p) use ($dateFrom, $dateTo) {
-                $p->where('reserved_from', '>=', $dateFrom)->where('reserved_from', '<=', $dateTo);
-            })->orWhere(function ($r) use ($dateFrom, $dateTo) {
-                $r->where('reserved_from', '<', $dateFrom)->where('reserved_to', '>', $dateFrom);
-            });
-        })->count();
+            ->where(function ($j) use ($providerId) {
+                $j->where('provider_id', '!=', $providerId)->orWhere('accepted', null);
+            })->where('ended', null)
+            ->where(function ($q) use ($dateFrom, $dateTo) {
+                $q->where(function ($p) use ($dateFrom, $dateTo) {
+                    $p->where('reserved_from', '>=', $dateFrom)->where('reserved_from', '<=', $dateTo);
+                })->orWhere(function ($r) use ($dateFrom, $dateTo) {
+                    $r->where('reserved_from', '<', $dateFrom)->where('reserved_to', '>', $dateFrom);
+                });
+            })->count();
         if ($conflictingUserSessionsCount > 0) {
             return response()->json(['error' => 'User sessions conflict', 'error_code' => 103], 409);
         }

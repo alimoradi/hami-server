@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Auth;
 
+use App\Affiliation;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Http\Request;
@@ -78,11 +79,17 @@ class AuthController extends Controller
         //$user->tinode_pass = $request->input('tinode_pass');
         //$user->tinode_uid = $request->input('tinode_uid');
         //$user->role_id = $this->accessManager->getRoleId('service_user');  
-        if ($user->save() && $isProvider) {
+        $saveResult = $user->save();
+        if ($saveResult && $isProvider) {
             $provider = new Provider;
             //$provider->provider_category_id = $request->input('provider_category_id');
             //$provider->per_minute_text_fee = 1200;
             $user->provider()->save($provider);
+        }
+        $affiliateCode = $request->input('affiliate_code');
+        if($saveResult && !$isProvider && $affiliateCode)
+        {
+            Affiliation::createAffiliation($user->id,$affiliateCode);
         }
 
 
@@ -114,8 +121,14 @@ class AuthController extends Controller
         $user = User::where('phone', $request->input('phone'))->firstOrFail();
         if ($user->verification_code == $request->input('verification_code')) {
             $user->phone_verified_at = Carbon::now();
-            $user->save();
-            return response()->json(['success' => true]);
+            $saveResult = $user->save();
+            if($saveResult)
+            {
+                
+                Affiliation::confirmAffiliation($user->id);
+                return response()->json(['success' => true]);
+
+            }
         }
         return response()->json([
             'error' => 'verification_code_mismatch', 'error_message' => 'The provided verification code is invalid.',

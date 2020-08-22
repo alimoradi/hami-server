@@ -82,7 +82,10 @@ Route::namespace('Api')->group(function () {
     
     Route::middleware('auth:api')->group(function(){
         Route::get('user', 'UsersController@me');
+        Route::get('getPeers', 'UsersController@getPeers');
         Route::post('makeCall', 'UsersController@makeCall');
+        Route::get('getDiscounts', 'UsersController@getDiscounts');
+        Route::post('useDiscount/{discountId}', 'UsersController@useDiscount');
 
     });
     Route::get('stats', 'UsersController@stats');
@@ -107,6 +110,17 @@ Route::namespace('Api')->group(function () {
             Route::post('uploadAvatar', 'FileController@uploadAvatar');
             Route::get('downloadMessageFile/{name}', 'FileController@downloadMessageFile');
         });
+    });
+    Route::prefix('questions')->group(function () {
+        Route::get('getAllQuestions', 'PublicQuestionAndAnswersController@getAllQuestions');
+        Route::get('getAnswers/{questionId}', 'PublicQuestionAndAnswersController@getAnswers');
+        Route::middleware('auth:api')->group(function(){
+            Route::get('getMyQuestions', 'PublicQuestionAndAnswersController@getMyQuestions');
+            Route::post('ask', 'PublicQuestionAndAnswersController@ask');
+            Route::post('answer', 'PublicQuestionAndAnswersController@answer');
+
+        });
+
     });
     Route::prefix('sessions')->group(function () {
         
