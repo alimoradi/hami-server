@@ -218,6 +218,7 @@ class UsersController extends Controller
     }
     public function useDiscount(Request $request, $discountId)
     {
+        
         $discount = auth()->user()->discounts()
             ->where('id', $discountId)
             ->where('activated', true)
