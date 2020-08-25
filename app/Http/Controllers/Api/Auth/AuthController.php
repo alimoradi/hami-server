@@ -121,19 +121,24 @@ class AuthController extends Controller
             $user = User::where('phone', $request->input('phone'))
                 ->firstOrFail();
         } catch (Exception $e) {
-            abort(404, 'phone number does not exit');
+            return response()->json(['error' => 'user does not exist', 'error_code' => 104], 404);
         }
         $user->verification_code = $this->accountVerifier->generateVerificationCode();
         if ($this->accountVerifier->sendVerificationCode($user->verification_code, $user->phone)) {
             $user->save();
             return response()->json(['success' => true], 200);
         }
-        abort(400, 'verification code not sent');
+        return response()->json(['error' => 'verification code not sent', 'error_code' => 105], 400);
     }
     public function retrievePassword(Request $request)
     {
         $request->validate(['phone' => 'required', 'verification_code' => 'required', 'password' => 'required']);
-        $user = User::where('phone', $request->input('phone'))->firstOrFail();
+        $user = null;
+        try {
+            $user = User::where('phone', $request->input('phone'))->firstOrFail();
+        } catch (Exception $e) {
+            return response()->json(['error' => 'user does not exist', 'error_code' => 104], 404);
+        }
         if ($user->verification_code == $request->input('verification_code')) {
             $user->phone_verified_at = Carbon::now();
             $user->password = $request->input('password');
@@ -142,10 +147,7 @@ class AuthController extends Controller
                 return response()->json(['success' => true]);
             }
         }
-        return response()->json([
-            'error' => 'verification_code_mismatch', 'error_message' => 'The provided verification code is invalid.',
-            'error_description' => 'The provided verification code is invalid.'
-        ], 404);
+        return response()->json(['error' => 'The provided verification code is invalid', 'error_code' => 106], 400);
     }
     public function verify(Request $request)
     {
