@@ -23,6 +23,8 @@ Route::namespace('Api')->group(function () {
         Route::post('register', 'AuthController@register');
         Route::post('verify', 'AuthController@verify');
         Route::post('requestVerificationCode', 'AuthController@requestVerificationCode');
+        Route::post('requestVerificationCodeForPasswordRetrieval', 'AuthController@requestVerificationCodeForPasswordRetrieval');
+        Route::post('retrievePassword', 'AuthController@retrievePassword');
         Route::post('postRegisterVerify', 'AuthController@postRegisterVerify');
         Route::middleware('auth:api')->group(function(){
             Route::post('updateChatCredentials', 'AuthController@updateChatCredentials');

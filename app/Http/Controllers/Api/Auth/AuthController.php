@@ -65,7 +65,7 @@ class AuthController extends Controller
         $roleId = $request->input('role_id');
         $isProvider = $roleId == $this->accessManager->getRoleId('service_provider');
         if ($isProvider) {
-           // $validations['provider_category_id'] = 'required';
+            // $validations['provider_category_id'] = 'required';
         }
         $request->validate($validations);
         $user = new User;
@@ -87,9 +87,8 @@ class AuthController extends Controller
             $user->provider()->save($provider);
         }
         $affiliateCode = $request->input('affiliate_code');
-        if($saveResult && !$isProvider && $affiliateCode)
-        {
-            Affiliation::createAffiliation($user->id,$affiliateCode);
+        if ($saveResult && !$isProvider && $affiliateCode) {
+            Affiliation::createAffiliation($user->id, $affiliateCode);
         }
 
 
@@ -114,6 +113,40 @@ class AuthController extends Controller
         }
         abort(400, 'verification code not sent');
     }
+    public function requestVerificationCodeForPasswordRetrieval(AccountVerifier $verifier, Request $request)
+    {
+        $request->validate(['phone' => 'required']);
+        $user = null;
+        try {
+            $user = User::where('phone', $request->input('phone'))
+                ->firstOrFail();
+        } catch (Exception $e) {
+            abort(404, 'phone number does not exit');
+        }
+        $user->verification_code = $this->accountVerifier->generateVerificationCode();
+        if ($this->accountVerifier->sendVerificationCode($user->verification_code, $user->phone)) {
+            $user->save();
+            return response()->json(['success' => true], 200);
+        }
+        abort(400, 'verification code not sent');
+    }
+    public function retrievePassword(Request $request)
+    {
+        $request->validate(['phone' => 'required', 'verification_code' => 'required', 'password' => 'required']);
+        $user = User::where('phone', $request->input('phone'))->firstOrFail();
+        if ($user->verification_code == $request->input('verification_code')) {
+            $user->phone_verified_at = Carbon::now();
+            $user->password = $request->input('password');
+            $saveResult = $user->save();
+            if ($saveResult) {
+                return response()->json(['success' => true]);
+            }
+        }
+        return response()->json([
+            'error' => 'verification_code_mismatch', 'error_message' => 'The provided verification code is invalid.',
+            'error_description' => 'The provided verification code is invalid.'
+        ], 404);
+    }
     public function verify(Request $request)
     {
 
@@ -122,12 +155,10 @@ class AuthController extends Controller
         if ($user->verification_code == $request->input('verification_code')) {
             $user->phone_verified_at = Carbon::now();
             $saveResult = $user->save();
-            if($saveResult)
-            {
-                
+            if ($saveResult) {
+
                 Affiliation::confirmAffiliation($user->id);
                 return response()->json(['success' => true]);
-
             }
         }
         return response()->json([
@@ -154,12 +185,11 @@ class AuthController extends Controller
 
 
         $credentials = $request->only('username', 'password');
-        
+
         if (auth()->attempt(['phone' => $credentials['username'], 'password' => $credentials['password']])) {
 
             $user = User::where('phone', $credentials['username'])->first();
-            if($user->phone_verified_at == null)
-            {
+            if ($user->phone_verified_at == null) {
                 return  response()->json([
                     'error' => 'not_verified', 'error_message' => 'user is not verified',
                     'error_description' => 'User is not verified.'
@@ -186,7 +216,7 @@ class AuthController extends Controller
             //var_dump($request->all());die;
             return Route::dispatch($tokenRequest);
         }
-        
+
         return response()->json([
             'error' => 'invalid_credentials', 'error_message' => 'The provided credentials are invalid.',
             'error_description' => 'The provided credentials are invalid.'
