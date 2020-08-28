@@ -18,7 +18,7 @@ class Affiliation extends Model
     public static function confirmAffiliation($userId)
     {
         $affiliation = Affiliation::where('visitor_id', $userId)->first();
-        if ($affiliation->confirmed == false) {
+        if ($affiliation && $affiliation->confirmed == false) {
             $affiliation->confirmed = true;
             if ($affiliation->save()) {
                 Discount::createAffiliateDiscount(

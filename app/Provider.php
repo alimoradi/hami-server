@@ -31,15 +31,15 @@ class Provider extends Model
     }
     public function getStatusAttribute()
     {
-        $status = 0;
+        $status = Provider::PROVIDER_STATUS_OFFLINE;
         $openSessionsCount = $this->sessions()
             ->where('started', "!=", null)
             ->where('ended', null)->count();
         $activitySwitch = $this->activity_switch;
         if ($activitySwitch)
-            $status = 1;
+            $status = Provider::PROIDER_STATUS_ONLINE;
         if ($openSessionsCount > 0) {
-            $status = 2;
+            $status = Provider::PROVIDER_STATUS_IN_SESSION;
         }
         return $status;
     }
@@ -70,12 +70,14 @@ class Provider extends Model
 
     public  const PROVIDER_STATUS_OFFLINE = 0;
     public  const PROIDER_STATUS_ONLINE = 1;
-    public const PROVIDER_STATUS_IN_SESSION = 3;
+    public const PROVIDER_STATUS_IN_SESSION = 2;
     public const PROVIDER_STATUS_NA = 3;
     public const EDUCATION_DEGREE_HIGH_SCHOOL_DIPLOMA = 1;
     public  const EDUCATION_DEGREE_BACHELORS = 2;
     public  const EDUCATION_DEGREE_MASTERS = 3;
     public  const EDUCATION_DEGREE_PHD = 4;
     
-   
+    public  const PROVIDER_STATS_ONLINE_COUNT = 1;
+    public  const PROVIDER_STATS_IN_SESSION_COUNT = 2;
+    public  const PROVIDER_STATS_TOTAL_COUNT = 3;
 }

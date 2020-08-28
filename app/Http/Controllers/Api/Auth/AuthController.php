@@ -56,21 +56,32 @@ class AuthController extends Controller
     public function register(AccountVerifier $verifier, Request $request)
     {
         $validations = [
-            'phone' => 'required|unique:users',
+            'phone' => 'required',
             'password' => 'required',
-            'first_name' => 'required',
-            'last_name' => 'required',
             'role_id' => 'required'
         ];
         $roleId = $request->input('role_id');
         $isProvider = $roleId == $this->accessManager->getRoleId('service_provider');
         if ($isProvider) {
             // $validations['provider_category_id'] = 'required';
+            $validations['first_name'] = 'required';
+            $validations['last_name'] = 'required';
         }
-        $request->validate($validations);
+        try {
+            $request->validate($validations);
+        } catch (Exception $x) {
+            return response()->json(['error' => 'invalid data', 'error_code' => 108], 400);
+        }
+        $user = User::where('phone', $request->input('phone'))->first();
+        if ($user) {
+            return response()->json(['error' => 'user already exists', 'error_code' => 107], 400);
+        }
         $user = new User;
-        $user->first_name = $request->input('first_name');
-        $user->last_name = $request->input('last_name');
+        if ($isProvider) {
+            $user->first_name = $request->input('first_name');
+            $user->last_name = $request->input('last_name');
+        }
+
         $user->phone = $request->input('phone');
         $user->password = $request->input('password');
 

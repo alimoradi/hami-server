@@ -139,6 +139,17 @@ class UsersController extends Controller
         ];
         return response()->json($config);
     }
+    public function usersStats()
+    {
+        $totalCount = User::count();
+        $verified =  User::where('phone_verified_at', '!=', null)->count();
+        
+        $stats = [
+            User::USER_STATS_TOTAL_COUNT => $totalCount,
+            User::USER_STATS_VERIFIED_COUNT => $verified
+        ];
+        return response()->json($stats);
+    }
     public function stats()
     {
         $onlineProviderCount = Provider::where('activity_switch', true)->count();
@@ -179,6 +190,7 @@ class UsersController extends Controller
         ];
         return response()->json($stats);
     }
+    
     public function makeCall(Request $request, VoiceCallMaker $callMaker)
     {
 
@@ -233,5 +245,9 @@ class UsersController extends Controller
         }
         return response()->json('',404);
 
+    }
+    public function getAll()
+    {
+        return User::where('role_id',User::USER_ROLE_ID)->get();
     }
 }

@@ -61,7 +61,7 @@ Route::namespace('Api')->group(function () {
             Route::post('activitySwitchOff', 'ProvidersController@activitySwitchOff');
 
             Route::get('getActivitySwitch', 'ProvidersController@getActivitySwitch');
-            Route::get('stats', 'ProvidersController@providerStats');
+            Route::get('providerStatsByStatus', 'ProvidersController@providerStatsByStatus');
         });
     });
     Route::prefix('calendar')->group(function () {
@@ -95,12 +95,14 @@ Route::namespace('Api')->group(function () {
     Route::prefix('users')->group(function () {
         Route::post('tempInvoiceCreate', 'UsersController@tempInvoiceCreate');
         Route::middleware('auth:api')->group(function(){
+            Route::get('usersStats', 'UsersController@usersStats');
             Route::get('getById/{id}', 'UsersController@getById');
             Route::get('getByUid/{uid}', 'UsersController@getByUid');
             Route::post('updateInfo', 'UsersController@updateInfo');
             Route::get('getAdditionalInfo/{userId}', 'UsersController@getAdditionalInfo');
             Route::get('getBalance', 'UsersController@getBalance');
             Route::post('deposit', 'UsersController@deposit');
+            Route::get('getAll', 'UsersController@getAll');
             
 
         });

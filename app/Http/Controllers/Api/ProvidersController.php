@@ -150,18 +150,19 @@ class ProvidersController extends Controller
         $provider->save();
         return response()->json(['success'=> true] );
     }
-    public function providerStats()
+    public function providerStatsByStatus()
     {
         $onlineCount = Provider::where('activity_switch', true)->count();
         $totalCount = Provider::count();
         $inSessionCount =  Provider::whereHas('sessions', function ($query) {
-            $query->where('started', '!=' , null)
-            ->where('ended', null);
+            $query->where('started', '!=', null)
+                ->where('ended', null);
         })->count();
+        
         $stats = [
-            'online_count' => $onlineCount,
-            'total_count' => $totalCount,
-            'in_session_count' => $inSessionCount
+            Provider::PROVIDER_STATS_ONLINE_COUNT => $onlineCount,
+            Provider::PROVIDER_STATS_TOTAL_COUNT => $totalCount,
+            Provider::PROVIDER_STATS_IN_SESSION_COUNT => $inSessionCount
         ];
         return response()->json($stats);
     }

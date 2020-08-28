@@ -179,4 +179,11 @@ class User extends Authenticatable
     protected $casts = [
         'phone_verified_at' => 'datetime',
     ];
+
+    public  const USER_STATS_VERIFIED_COUNT = 1;
+    public  const USER_STATS_TOTAL_COUNT = 2;
+
+    public const USER_ROLE_ID =2 ;
+    public const PROVIDER_ROLE_ID = 1;
+    public const ADMIN_ROLE_ID =3 ;
 }
