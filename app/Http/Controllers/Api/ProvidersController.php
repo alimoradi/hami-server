@@ -195,7 +195,7 @@ class ProvidersController extends Controller
         {
             $thumbnailArray[] = $user->avatar_thumbnail;
         }
-        return response()->json($query->toArray() );
+        return response()->json($thumbnailArray );
        
     }
 }
