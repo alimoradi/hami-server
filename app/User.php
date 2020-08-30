@@ -8,10 +8,12 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable
 {
     use Notifiable, HasApiTokens;
+    protected $appends = ['avatar_thumbnail'];
 
 
     public function findForPassport($username)
@@ -68,13 +70,11 @@ class User extends Authenticatable
     }
     public function p2pPeers()
     {
-        return User::whereHas('p2pSubscriptions', function ($query){
-            $query->whereHas('topic.subscribers',function($query){
-                $query->where('user_id' , '!=', $this->id);
+        return User::whereHas('p2pSubscriptions', function ($query) {
+            $query->whereHas('topic.subscribers', function ($query) {
+                $query->where('user_id', '!=', $this->id);
             });
         })->get();
-        
-        
     }
     public function topics()
     {
@@ -97,12 +97,11 @@ class User extends Authenticatable
             ->where('must_subscribe', true)
             ->with(['topic']);
     }
-    
+
     public function createTopic()
     {
         $userTopic = Topic::where('name', $this->tinode_uid)->first();
-        if($userTopic === null)
-        {
+        if ($userTopic === null) {
             $userTopic = new Topic();
             $userTopic->name = $this->tinode_uid;
             $userTopic->type = Topic::TOPIC_TYPE_PEER;
@@ -141,7 +140,7 @@ class User extends Authenticatable
     }
     public function deposit($amount)
     {
-        
+
         $invoice = new Invoice();
         $invoice->created_at = Carbon::now();
         $invoice->is_final = true;
@@ -152,6 +151,83 @@ class User extends Authenticatable
         $invoice->related_id = 0;
         $invoice->save();
         return $invoice;
+    }
+    public function getAvatarThumbnailAttribute()
+    {
+        $directory = 'public/';
+        if($this->avatar == null)
+        {
+            return null;
+        }
+        if(!Storage::exists($directory.$this->avatar))
+        {
+            return null;
+        }
+        if(Storage::exists($directory.User::AVATAR_THUMBNAIL_PREFIX.$this->avatar))
+        {
+            return User::AVATAR_THUMBNAIL_PREFIX.$this->avatar;
+        }
+        $imageUrl = Storage::path($directory) .$this->avatar;
+        $temp = tmpfile();
+        $metaDatas = stream_get_meta_data($temp);
+        $tmpFilename = $metaDatas['uri'];
+        fclose($temp);
+        file_put_contents($tmpFilename, file_get_contents($imageUrl));
+        $this->saveAvatarThumbnail($tmpFilename, 'public',$this->avatar);
+        return User::AVATAR_THUMBNAIL_PREFIX.$this->avatar;
+    }
+    public function saveAvatar($image)
+    {
+        $size = $image->getsize();
+        $mime = $image->getMimeType();
+        $extension = $image->extension();
+        $directory = 'public';
+        $name = uniqid("", true) . '.' . $extension;
+        $width = getimagesize($image)[0];
+        $height = getimagesize($image)[1];
+        Storage::putFileAs($directory, $image, $name);
+        $this->saveAvatarThumbnail($image->path(), $directory, $name);
+        $this->avatar = $name;
+        $this->save();
+        return  [
+            'name' => $name,
+            'width' => $width,
+            'height' => $height,
+            'mime_type' => $mime,
+            'size' => $size,
+            'extension' => $extension
+        ];
+    }
+    private function saveAvatarThumbnail($image, $directory, $name)
+    {
+        $width = getimagesize($image)[0];
+        $height = getimagesize($image)[1];
+        var_dump($width);
+        $newWidth = User::AVATAR_THUMBNAIL_WIDTH;
+        $newHeight = $height * $newWidth / $width;
+        $newImage = imagecreatetruecolor($newWidth, $newHeight);
+        $mime =mime_content_type($image);
+        $imageResource = null;
+        switch ($mime) {
+            case "image/jpeg":
+                $imageResource = imagecreatefromjpeg($image);
+                break;
+            case "image/png":
+                $imageResource = imagecreatefrompng($image);
+                break;
+        }
+        imagecopyresized($newImage, $imageResource, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+
+        switch ($mime) {
+            case "image/jpeg":
+                imagejpeg($newImage, $image);
+                break;
+            case "image/png":
+                imagepng($newImage, $image);
+                break;
+        }
+
+        Storage::putFileAs($directory, $image, User::AVATAR_THUMBNAIL_PREFIX . $name);
     }
     /**
      * The attributes that are mass assignable.
@@ -183,7 +259,10 @@ class User extends Authenticatable
     public  const USER_STATS_VERIFIED_COUNT = 1;
     public  const USER_STATS_TOTAL_COUNT = 2;
 
-    public const USER_ROLE_ID =2 ;
+    public const USER_ROLE_ID = 2;
     public const PROVIDER_ROLE_ID = 1;
-    public const ADMIN_ROLE_ID =3 ;
+    public const ADMIN_ROLE_ID = 3;
+
+    public const AVATAR_THUMBNAIL_PREFIX = 'avatar_100_';
+    public const  AVATAR_THUMBNAIL_WIDTH = 100;
 }
