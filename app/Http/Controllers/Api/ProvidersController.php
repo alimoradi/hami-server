@@ -189,7 +189,12 @@ class ProvidersController extends Controller
                 $query->where('provider_categories.id',$categoryId);
             });
         }
-        $query = $query->inRandomOrder()->limit(7)->pluck('avatar_thumbnail');
+        $query = $query->inRandomOrder()->limit(7);
+        $thumbnailArray = Array();
+        foreach($query->toArray() as $user)
+        {
+            $thumbnailArray[] = $user->avatar_thumbnail;
+        }
         return response()->json($query->toArray() );
        
     }
