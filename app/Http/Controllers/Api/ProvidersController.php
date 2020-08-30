@@ -191,7 +191,7 @@ class ProvidersController extends Controller
         }
         $query = $query->inRandomOrder()->limit(7);
         $thumbnailArray = Array();
-        foreach($query->toArray() as $user)
+        foreach($query->get() as $user)
         {
             $thumbnailArray[] = $user->avatar_thumbnail;
         }
