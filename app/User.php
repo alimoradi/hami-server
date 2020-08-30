@@ -202,7 +202,6 @@ class User extends Authenticatable
     {
         $width = getimagesize($image)[0];
         $height = getimagesize($image)[1];
-        var_dump($width);
         $newWidth = User::AVATAR_THUMBNAIL_WIDTH;
         $newHeight = $height * $newWidth / $width;
         $newImage = imagecreatetruecolor($newWidth, $newHeight);
