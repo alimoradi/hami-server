@@ -15,8 +15,7 @@ services:
       - app-volume:/var/www/hami-server
       - ./hami-persistent/.env:/var/www/hami-server/.env
       - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
-      - ./hami-persistent/hami-storage/oauth-private.key:/var/www/hami-server/storage/oauth-private.key
-      - ./hami-persistent/hami-storage/oauth-public.key:/var/www/hami-server/storage/oauth-public.key
+      - ./hami-persistent/hami-storage/:/var/www/hami-server/storage/
 
     networks:
       - hami-network
@@ -94,4 +93,5 @@ networks:
   hami-network:
     driver: bridge
 #Docker Volumes
+volumes:
   app-volume:
