@@ -12,11 +12,11 @@ services:
     tty: true
     working_dir: /var/www
     volumes:
-      - .:/var/www/hami-server
-      - ../hami-persistent/.env:/var/www/hami-server/.env
+      - app-volume:/var/www/hami-server
+      - ./hami-persistent/.env:/var/www/hami-server/.env
       - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
-      - ../hami-persistent/hami-storage/oauth-private.key:/var/www/hami-server/storage/oauth-private.key
-      - ../hami-persistent/hami-storage/oauth-public.key:/var/www/hami-server/storage/oauth-public.key
+      - ./hami-persistent/hami-storage/oauth-private.key:/var/www/hami-server/storage/oauth-private.key
+      - ./hami-persistent/hami-storage/oauth-public.key:/var/www/hami-server/storage/oauth-public.key
 
     networks:
       - hami-network
@@ -25,7 +25,7 @@ services:
     container_name: hami-composer
     image: composer
     volumes:
-      - .:/app
+      - app-volume:/app
     command: composer install
     networks:
       - hami-network
@@ -39,7 +39,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - .:/var/www/hami-server
+      - app-volume:/var/www/hami-server
       - ./nginx/conf.d/:/etc/nginx/conf.d/
     networks:
       - hami-network
@@ -58,7 +58,7 @@ services:
       SERVICE_TAGS: dev
       SERVICE_NAME: mysql
     volumes:
-      - ../hami-persistent/hami-db:/var/lib/mysql/
+      - ./hami-persistent/hami-db:/var/lib/mysql/
       - ./mysql/my.cnf:/etc/mysql/my.cnf
       - ./mysql/init.sql:/data/application/init.sql
     networks:
@@ -86,10 +86,12 @@ services:
     environment: 
       EXT_CONFIG: ./conf/tinode.conf
     volumes:
-      - ../hami-persistent/tinode/:/opt/tinode/conf
+      - ./hami-persistent/tinode/:/opt/tinode/conf
     networks:
       - hami-network
 #Docker Networks
 networks:
   hami-network:
     driver: bridge
+#Docker Volumes
+  app-volume:
