@@ -22,7 +22,7 @@ class User extends Authenticatable
     }
     public function favoriteProviders()
     {
-        return $this->belongsToMany(Provider::class)->using(FavoriteProvider::class)->with(['user', 'providerCategories']);
+        return $this->hasManyThrough(Provider::class, FavoriteProvider::class)->with(['user', 'providerCategories']);
     }
     public function validateForPassportPasswordGrant($password)
     {
