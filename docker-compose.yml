@@ -12,9 +12,10 @@ services:
     tty: true
     working_dir: /var/www
     volumes:
-      - app-volume:/var/www/hami-server
+      - .:/var/www/hami-server
       - ../hami-persistent/.env:/var/www/hami-server/.env
       - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
+      - ../hami-persistent/hami-storage/:/var/www/hami-server/storage
     networks:
       - hami-network
   #Composer Service
@@ -22,7 +23,7 @@ services:
     container_name: hami-composer
     image: composer
     volumes:
-      - app-volume:/app
+      - .:/app
     command: composer install
     networks:
       - hami-network
@@ -36,7 +37,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - app-volume:/var/www/hami-server
+      - .:/var/www/hami-server
       - ./nginx/conf.d/:/etc/nginx/conf.d/
     networks:
       - hami-network
@@ -90,6 +91,3 @@ services:
 networks:
   hami-network:
     driver: bridge
-#Volumes
-volumes:
-  app-volume:
