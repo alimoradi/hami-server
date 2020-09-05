@@ -2,12 +2,12 @@ version: '3'
 services:
 
   #PHP Service
-  app:
+  hami-app:
     build:
       context: .
       dockerfile: Dockerfile
     image: digitalocean.com/php
-    container_name: app
+    container_name: hami-app
     restart: unless-stopped
     tty: true
     environment:
@@ -15,30 +15,38 @@ services:
       SERVICE_TAGS: dev
     working_dir: /var/www
     volumes:
-      - /var/www:/var/www
+      - app-volume::/var/www/hami-server
       - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
     networks:
-      - app-network
-
+      - hami-network
+  #Composer Service
+  hami-composer:
+    container_name: hami-composer
+    image: composer
+    volumes:
+      - app-volume:/app
+    command: composer install
+    networks:
+      - hami-network
   #Nginx Service
-  webserver:
+  hami-webserver:
     image: nginx:alpine
-    container_name: webserver
+    container_name: hami-webserver
     restart: unless-stopped
     tty: true
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - /var/www:/var/www
+      - ./public:/var/www/hami-server/public
       - ./nginx/conf.d/:/etc/nginx/conf.d/
     networks:
-      - app-network
+      - hami-network
 
   #MySQL Service
-  db:
+  hami-db:
     image: mysql:5.7.22
-    container_name: db
+    container_name: hami-db
     restart: unless-stopped
     tty: true
     ports:
@@ -49,21 +57,23 @@ services:
       SERVICE_TAGS: dev
       SERVICE_NAME: mysql
     volumes:
-      - dbdata:/var/lib/mysql/
+      - ./dbdata:/var/lib/mysql/
       - ./mysql/my.cnf:/etc/mysql/my.cnf
+      - ./mysql/init.sql::/data/application/init.sql
     networks:
-      - app-network
+      - hami-network
   #PhpMyAdmin Service
-  pma:
+  hami-pma:
     image: phpmyadmin/phpmyadmin
-    container_name: pma
+    container_name: hami-pma
     restart: unless-stopped
     tty: true
     ports:
-      - "8080:80"
-    
+      - "81:80"
+    environment:
+      PMA_HOSTS: hami-db
     networks:
-      - app-network
+      - hami-network
   #tinode Service
   tinode:
     image: tinode/tinode-mysql:latest
@@ -71,18 +81,17 @@ services:
     restart: unless-stopped
     tty: true
     ports:
-      - "81:6060"
+      - "8080:6060"
     environment: 
       EXT_CONFIG: ./conf/tinode.conf
     volumes:
-      - /var/www/hami-server/tinode/:/opt/tinode/conf
+      - ./tinode/:/opt/tinode/conf
     networks:
-      - app-network
+      - hami-network
 #Docker Networks
 networks:
-  app-network:
+  hami-network:
     driver: bridge
 #Volumes
 volumes:
-  dbdata:
-    driver: local
+  app-volume:

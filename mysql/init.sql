@@ -1,0 +1,3 @@
+CREATE DATABASE IF NOT EXISTS 'hami-server';
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'root';
+USE dev;
