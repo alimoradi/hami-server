@@ -22,7 +22,7 @@ class FavoriteProvidersController extends Controller
         }
         
         
-        return FavoriteProvider::with(['provider','provider.user', 'provider.providerCategory'])->find($favoriteProvider->id);
+        return FavoriteProvider::with(['provider','provider.user', 'provider.providerCategories'])->find($favoriteProvider->id);
     }
     public function delete($providerId)
     {
