@@ -20,7 +20,10 @@ class User extends Authenticatable
     {
         return $this->where('phone', $username)->where('phone_verified_at', '<>', '')->first();
     }
-
+    public function favoriteProviders()
+    {
+        return $this->belongsToMany(Provider::class)->using(FavoriteProvider::class)->with(['user', 'providerCategories']);
+    }
     public function validateForPassportPasswordGrant($password)
     {
         //$hasher = new HSAUserHasher(); // Or whomever does your hashing
