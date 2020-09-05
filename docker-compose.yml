@@ -84,7 +84,7 @@ services:
     environment: 
       EXT_CONFIG: ./conf/tinode.conf
     volumes:
-      - ../persistent/tinode/:/opt/tinode/conf
+      - ../hami-persistent/tinode/:/opt/tinode/conf
     networks:
       - hami-network
 #Docker Networks
