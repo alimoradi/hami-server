@@ -10,12 +10,10 @@ services:
     container_name: hami-app
     restart: unless-stopped
     tty: true
-    environment:
-      SERVICE_NAME: app
-      SERVICE_TAGS: dev
     working_dir: /var/www
     volumes:
       - app-volume:/var/www/hami-server
+      - ./.env:/var/www/hami-server/.env
       - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
     networks:
       - hami-network
@@ -38,7 +36,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./public:/var/www/hami-server/public
+      - app-volume:/var/www/hami-server
       - ./nginx/conf.d/:/etc/nginx/conf.d/
     networks:
       - hami-network
@@ -57,7 +55,7 @@ services:
       SERVICE_TAGS: dev
       SERVICE_NAME: mysql
     volumes:
-      - ./dbdata:/var/lib/mysql/
+      - ../dbdata:/var/lib/mysql/
       - ./mysql/my.cnf:/etc/mysql/my.cnf
       - ./mysql/init.sql:/data/application/init.sql
     networks:
