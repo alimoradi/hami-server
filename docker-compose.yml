@@ -15,7 +15,7 @@ services:
       SERVICE_TAGS: dev
     working_dir: /var/www
     volumes:
-      - app-volume::/var/www/hami-server
+      - app-volume:/var/www/hami-server
       - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
     networks:
       - hami-network
@@ -57,9 +57,9 @@ services:
       SERVICE_TAGS: dev
       SERVICE_NAME: mysql
     volumes:
-      - dbdata:/var/lib/mysql/
+      - ./dbdata:/var/lib/mysql/
       - ./mysql/my.cnf:/etc/mysql/my.cnf
-      - ./mysql/init.sql::/data/application/init.sql
+      - ./mysql/init.sql:/data/application/init.sql
     networks:
       - hami-network
   #PhpMyAdmin Service
@@ -94,6 +94,4 @@ networks:
     driver: bridge
 #Volumes
 volumes:
-  dbdata:
-    driver: local
   app-volume:
