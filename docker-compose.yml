@@ -13,9 +13,9 @@ services:
     working_dir: /var/www
     volumes:
       - app-volume:/var/www/hami-server
-      - ./hami-persistent/.env:/var/www/hami-server/.env
+      - ../hami-persistent/.env:/var/www/hami-server/.env
       - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
-      - ./hami-persistent/hami-storage/:/var/www/hami-server/storage/
+      - ../hami-persistent/hami-storage/:/var/www/hami-server/storage/
 
     networks:
       - hami-network
@@ -39,6 +39,7 @@ services:
       - "443:443"
     volumes:
       - app-volume:/var/www/hami-server
+      - ../hami-persistent/hami-storage/:/var/www/hami-server/storage/
       - ./nginx/conf.d/:/etc/nginx/conf.d/
     networks:
       - hami-network
@@ -57,7 +58,7 @@ services:
       SERVICE_TAGS: dev
       SERVICE_NAME: mysql
     volumes:
-      - ./hami-persistent/hami-db:/var/lib/mysql/
+      - ../hami-persistent/hami-db:/var/lib/mysql/
       - ./mysql/my.cnf:/etc/mysql/my.cnf
       - ./mysql/init.sql:/data/application/init.sql
     networks:
@@ -85,7 +86,7 @@ services:
     environment: 
       EXT_CONFIG: ./conf/tinode.conf
     volumes:
-      - ./hami-persistent/tinode/:/opt/tinode/conf
+      - ../hami-persistent/tinode/:/opt/tinode/conf
     networks:
       - hami-network
 #Docker Networks
