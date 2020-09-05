@@ -55,7 +55,7 @@ services:
       SERVICE_TAGS: dev
       SERVICE_NAME: mysql
     volumes:
-      - ../dbdata:/var/lib/mysql/
+      - ../hami-db:/var/lib/mysql/
       - ./mysql/my.cnf:/etc/mysql/my.cnf
       - ./mysql/init.sql:/data/application/init.sql
     networks:
