@@ -6,6 +6,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        CACHEDISABLE: $(date +%s)
     image: digitalocean.com/php
     container_name: hami-app
     restart: unless-stopped
