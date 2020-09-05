@@ -15,7 +15,6 @@ services:
       - app-volume:/var/www/hami-server
       - ../hami-persistent/.env:/var/www/hami-server/.env
       - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
-      - ../hami-persistent/hami-storage/:/var/www/hami-server/storage
     networks:
       - hami-network
   #Composer Service
