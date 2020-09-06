@@ -40,6 +40,7 @@ services:
     volumes:
       - .:/var/www/hami-server
       - ../hami-persistent/hami-storage/:/var/www/hami-server/storage/
+      - ../hami-persistent/hami-storage/app/public/:/var/www/hami-server/public/storage/
       - ./nginx/conf.d/:/etc/nginx/conf.d/
     networks:
       - hami-network
