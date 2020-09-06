@@ -146,6 +146,7 @@ Route::namespace('Api')->group(function () {
             Route::get('getProviderPresentAndFutureSessions/{providerId}', 'SessionsController@getProviderPresentAndFutureSessions');
 
             Route::get('getPastSessions', 'SessionsController@getPastSessions');
+            Route::get('getById/{sessionId}', 'SessionsController@getSession');
 
             Route::get('getSessions', 'SessionsController@getSessions');
             Route::get('getActiveRequests', 'SessionsController@getActiveRequests');

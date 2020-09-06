@@ -327,4 +327,9 @@ class SessionsController extends Controller
         $session->save();
         return response()->json(['success' => true]);
     }
+    public function getById($sessionId)
+    {
+        return Session::find($sessionId)->with(['provider', 'provider.user', 'user', 'provider.providerCategories'])->find($session->id);
+
+    }
 }
