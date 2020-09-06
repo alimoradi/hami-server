@@ -16,6 +16,7 @@ services:
       - ../hami-persistent/.env:/var/www/hami-server/.env
       - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
       - ../hami-persistent/hami-storage/:/var/www/hami-server/storage/
+      - ../hami-persistent/firebase/:/var/www/hami-server/firebase/
 
     networks:
       - hami-network
@@ -42,6 +43,7 @@ services:
       - ../hami-persistent/hami-storage/:/var/www/hami-server/storage/
       - ../hami-persistent/hami-storage/app/public/:/var/www/hami-server/public/storage/
       - ./nginx/conf.d/:/etc/nginx/conf.d/
+      - ../hami-persistent/firebase/:/var/www/hami-server/firebase/
     networks:
       - hami-network
 
