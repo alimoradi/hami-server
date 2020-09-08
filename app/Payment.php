@@ -4,6 +4,7 @@ namespace App;
 
 use App\Libraries\Notifications\PaymentConfirmed;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 
 class Payment extends Model
@@ -41,9 +42,16 @@ class Payment extends Model
         $this->invoice->is_final = true;
         $this->invoice->is_pre_invoice = false;
         $this->save();
-        $this->user->notify(new PaymentConfirmed($this->reference_id));
-
         $this->invoice->save();
+        try{
+            $this->user->notify(new PaymentConfirmed(strval($this->reference_id)));
+        }
+        catch(Exception $ex)
+        {
+            
+        }
+
+        
     } 
 
 }
