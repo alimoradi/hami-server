@@ -155,6 +155,17 @@ class User extends Authenticatable
         $invoice->save();
         return $invoice;
     }
+    public function requestDeposit($amount, $authorityCode)
+    {
+        $payment = new Payment();
+        $payment->user_id = $this->id;
+        $payment->amount = $amount;
+        $payment->authority_code = $authorityCode;
+        $payment->save();
+        $payment->createInvoice();
+        return $payment;
+    }
+    
     public function getAvatarThumbnailAttribute()
     {
         $directory = 'public/';

@@ -26,7 +26,7 @@ Route::namespace('Api')->group(function () {
         Route::post('requestVerificationCodeForPasswordRetrieval', 'AuthController@requestVerificationCodeForPasswordRetrieval');
         Route::post('retrievePassword', 'AuthController@retrievePassword');
         Route::post('postRegisterVerify', 'AuthController@postRegisterVerify');
-        Route::middleware('auth:api')->group(function(){
+        Route::middleware('auth:api')->group(function () {
             Route::post('updateChatCredentials', 'AuthController@updateChatCredentials');
             Route::post('setFcmToken', 'AuthController@setFcmToken');
             Route::post('unsetFcmToken', 'AuthController@unsetFcmToken');
@@ -41,7 +41,7 @@ Route::namespace('Api')->group(function () {
         Route::get('getById/{id}', 'ProvidersController@getById');
         Route::get('getFees', 'ProvidersController@getFees');
         Route::get('getRandomAvatars/{categoryId?}', 'ProvidersController@getRandomAvatars');
-        Route::middleware('auth:api')->group(function(){
+        Route::middleware('auth:api')->group(function () {
 
             Route::post('addFavorite/{providerId}', 'FavoriteProvidersController@add');
             Route::post('deleteFavorite/{providerId}', 'FavoriteProvidersController@delete');
@@ -65,7 +65,7 @@ Route::namespace('Api')->group(function () {
         });
     });
     Route::prefix('calendar')->group(function () {
-       Route::middleware('auth:api')->group(function(){
+        Route::middleware('auth:api')->group(function () {
             Route::post('addAvailableHours', 'AvailableHoursController@add');
             Route::post('removeAvailableHours/{availableHoursId}', 'AvailableHoursController@remove');
             Route::post('disableAvailableHours/{availableHoursId}', 'AvailableHoursController@disable');
@@ -75,26 +75,30 @@ Route::namespace('Api')->group(function () {
         });
     });
     Route::prefix('notify')->group(function () {
-        
-        Route::middleware('auth:api')->group(function(){
+
+        Route::middleware('auth:api')->group(function () {
             Route::post('sentMessage', 'UsersController@notifySentMessage');
             Route::post('sessionUpdate', 'SessionsController@notifySessionUpdate');
         });
     });
-    
-    Route::middleware('auth:api')->group(function(){
-        Route::get('user', 'UsersController@me');
+    Route::prefix('payment')->group(function () {
+        Route::get('paymentCallback', 'UsersController@paymentCallback');
+        Route::middleware('auth:api')->group(function () {
+            Route::get('getPaymentAuthority/{amount}', 'UsersController@getPaymentAuthority');
+        });
+    });
+    Route::middleware('auth:api')->group(function () {
+
         Route::get('getPeers', 'UsersController@getPeers');
         Route::post('makeCall', 'UsersController@makeCall');
         Route::get('getDiscounts', 'UsersController@getDiscounts');
         Route::post('useDiscount/{discountId}', 'UsersController@useDiscount');
-
     });
     Route::get('stats', 'UsersController@stats');
     Route::get('config', 'UsersController@config');
     Route::prefix('users')->group(function () {
         Route::post('tempInvoiceCreate', 'UsersController@tempInvoiceCreate');
-        Route::middleware('auth:api')->group(function(){
+        Route::middleware('auth:api')->group(function () {
             Route::get('usersStats', 'UsersController@usersStats');
             Route::get('getById/{id}', 'UsersController@getById');
             Route::get('getByUid/{uid}', 'UsersController@getByUid');
@@ -103,13 +107,11 @@ Route::namespace('Api')->group(function () {
             Route::get('getBalance', 'UsersController@getBalance');
             Route::post('deposit', 'UsersController@deposit');
             Route::get('getAll', 'UsersController@getAll');
-            
-
         });
     });
     Route::prefix('files')->group(function () {
-        
-        Route::middleware('auth:api')->group(function(){
+
+        Route::middleware('auth:api')->group(function () {
             Route::post('uploadMessageFile', 'FileController@uploadMessageFile');
             Route::post('uploadAvatar', 'FileController@uploadAvatar');
             Route::get('downloadMessageFile/{name}', 'FileController@downloadMessageFile');
@@ -118,17 +120,15 @@ Route::namespace('Api')->group(function () {
     Route::prefix('questions')->group(function () {
         Route::get('getAllQuestions', 'PublicQuestionAndAnswersController@getAllQuestions');
         Route::get('getAnswers/{questionId}', 'PublicQuestionAndAnswersController@getAnswers');
-        Route::middleware('auth:api')->group(function(){
+        Route::middleware('auth:api')->group(function () {
             Route::get('getMyQuestions', 'PublicQuestionAndAnswersController@getMyQuestions');
             Route::post('ask', 'PublicQuestionAndAnswersController@ask');
             Route::post('answer', 'PublicQuestionAndAnswersController@answer');
-
         });
-
     });
     Route::prefix('sessions')->group(function () {
-        
-        Route::middleware('auth:api')->group(function(){
+
+        Route::middleware('auth:api')->group(function () {
             Route::post('request', 'SessionsController@request');
             Route::post('start/{sessionId}', 'SessionsController@start');
             Route::post('accept/{sessionId}', 'SessionsController@accept');
@@ -151,7 +151,6 @@ Route::namespace('Api')->group(function () {
             Route::get('getSessions', 'SessionsController@getSessions');
             Route::get('getActiveRequests', 'SessionsController@getActiveRequests');
             Route::post('checkRequestEligibility', 'SessionsController@checkRequestEligibility');
-
         });
     });
     Route::prefix('tinodeAuthenticator')->group(function () {
@@ -164,9 +163,4 @@ Route::namespace('Api')->group(function () {
         Route::post('upd', 'TinodeRestAuthenticatorController@update');
         Route::post('rtagns', 'TinodeRestAuthenticatorController@restrictedTagNamespaces');
     });
-
-
-
-
-    
 });

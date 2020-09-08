@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Interfaces\VoiceCallMaker;
 use App\Invoice;
 use App\Libraries\Notifications\IncomingCall;
+use App\Payment;
 use App\Provider;
 use App\ProviderCategory;
 use App\Session;
@@ -17,6 +18,7 @@ use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use SoapClient;
 
 class UsersController extends Controller
 {
@@ -71,13 +73,13 @@ class UsersController extends Controller
     {
         $userId = auth()->user()->id;
         $query = Invoice::where('user_id', $userId);
-        $spendable = $query->where(function($j){
+        $spendable = $query->where(function ($j) {
             $j->where(function ($q) {
                 $q->where('amount', '>', 0)->where('is_final', true);
             })->orWhere('amount', '<', 0);
         })->where('deleted', false);
-        
-        
+
+
         $spendableAmount = $spendable->sum('amount');
         $real = $spendable->where('is_final', true)->sum('amount');
         return response()->json(['real' => $real, 'spendable' => $spendableAmount]);
@@ -143,7 +145,7 @@ class UsersController extends Controller
     {
         $totalCount = User::count();
         $verified =  User::where('phone_verified_at', '!=', null)->count();
-        
+
         $stats = [
             User::USER_STATS_TOTAL_COUNT => $totalCount,
             User::USER_STATS_VERIFIED_COUNT => $verified
@@ -186,11 +188,11 @@ class UsersController extends Controller
             'online_provider_count' => $onlineProviderCount,
             'total_provider_count' => $totalProviderCount,
             'in_session_provider_count' => $inSessionProviderCount,
-            'category_stats'=>$categoryProviderStats
+            'category_stats' => $categoryProviderStats
         ];
         return response()->json($stats);
     }
-    
+
     public function makeCall(Request $request, VoiceCallMaker $callMaker)
     {
 
@@ -206,19 +208,16 @@ class UsersController extends Controller
         $receptorUsername = $receptor->phone;
         $maxDuration = $request->input('max_duration');
         $call = $callMaker->createCall($callerUsername, $receptorUsername, $maxDuration);
-       
 
-        if($call)
-        {
+
+        if ($call) {
             $callId = $call->id;
             $callerAccessToken = $call->caller->accessToken;
             $receptorAccessToken = $call->receptor->accessToken;;
-            $receptor->notify(new IncomingCall($receptorAccessToken, $callId,json_encode( auth()->user()), strval($maxDuration)));
-            return response()->json(['id' =>$callId, 'access_token' => $callerAccessToken ]);
+            $receptor->notify(new IncomingCall($receptorAccessToken, $callId, json_encode(auth()->user()), strval($maxDuration)));
+            return response()->json(['id' => $callId, 'access_token' => $callerAccessToken]);
         }
-        return response()->json('',404);
-        
-
+        return response()->json('', 404);
     }
     public function getPeers()
     {
@@ -230,24 +229,74 @@ class UsersController extends Controller
     }
     public function useDiscount(Request $request, $discountId)
     {
-        
+
         $discount = auth()->user()->discounts()
             ->where('id', $discountId)
             ->where('activated', true)
             ->where('expired', false)->first();
-        if($discount)
-        {
+        if ($discount) {
             $invoice = auth()->user()->deposit($discount->value);
             $discount->expired = true;
             $discount->expired_at = Carbon::now();
             $discount->save();
             return response()->json($invoice);
         }
-        return response()->json('',404);
-
+        return response()->json('', 404);
     }
     public function getAll()
     {
-        return User::where('role_id',User::USER_ROLE_ID)->get();
+        return User::where('role_id', User::USER_ROLE_ID)->get();
+    }
+    public function getPaymentAuthority($amount)
+    {
+        $MerchantID = 'abc437bf-29c0-4580-b4d7-618b4eff3a70'; //Required
+        $Amount = $amount;
+        $Description = 'افزایش اعتبار'; // Required
+        $Mobile = auth()->user()->phone;
+        $CallbackURL = 'http://51.210.61.202/api/payment/paymentCallback'; // Required
+        $client = new SoapClient('https://www.zarinpal.com/pg/services/WebGate/wsdl', ['encoding' => 'UTF-8']);
+        $result = $client->PaymentRequest(
+            [
+                'MerchantID' => $MerchantID,
+                'Amount' => $Amount,
+                'Description' => $Description,
+                'Mobile' => $Mobile,
+                'CallbackURL' => $CallbackURL,
+            ]
+        );
+        if ($result->Status == 100) {
+            auth()->user()->requestDeposit($Amount,$result->Authority);
+            return response()->json(['authority_code' => $result->Authority]);
+        }
+        return response()->json(['error' => 'payment authority failed', 'error_code' => 109], 400);
+    }
+    public function paymentCallback()
+    {
+        $MerchantID = 'abc437bf-29c0-4580-b4d7-618b4eff3a70';
+        
+        $Authority = $_GET['Authority'];
+        $payment = Payment::getPaymentByAuthorityCode( $Authority);
+        $Amount = $payment->amount;
+        if ($_GET['Status'] == 'OK') {
+
+            $client = new SoapClient('https://www.zarinpal.com/pg/services/WebGate/wsdl', ['encoding' => 'UTF-8']);
+
+            $result = $client->PaymentVerification(
+                [
+                    'MerchantID' => $MerchantID,
+                    'Authority' => $Authority,
+                    'Amount' => $Amount,
+                ]
+            );
+
+            if ($result->Status == 100) {
+                $payment->verify($result->RefID);
+                echo 'Transaction success. RefID:' . $result->RefID;
+            } else {
+                echo 'Transaction failed. Status:' . $result->Status;
+            }
+        } else {
+            echo 'Transaction canceled by user';
+        }
     }
 }
