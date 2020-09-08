@@ -88,7 +88,7 @@ Route::namespace('Api')->group(function () {
         });
     });
     Route::middleware('auth:api')->group(function () {
-
+        Route::get('user', 'UsersController@me');
         Route::get('getPeers', 'UsersController@getPeers');
         Route::post('makeCall', 'UsersController@makeCall');
         Route::get('getDiscounts', 'UsersController@getDiscounts');
