@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Libraries\Notifications\PaymentConfirmed;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
@@ -40,6 +41,8 @@ class Payment extends Model
         $this->invoice->is_final = true;
         $this->invoice->is_pre_invoice = false;
         $this->save();
+        $this->user->notify(new PaymentConfirmed($this->reference_id));
+
         $this->invoice->save();
     } 
 
