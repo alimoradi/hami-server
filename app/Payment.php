@@ -36,7 +36,7 @@ class Payment extends Model
     }
     public function verify($referenceId)
     {
-        $this->verified = true;
+        $this->is_verified = true;
         $this->reference_id = $referenceId;
         $this->invoice->is_final = true;
         $this->invoice->is_pre_invoice = false;
