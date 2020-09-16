@@ -185,8 +185,8 @@ class SessionsController extends Controller
         $request->validate([
             'from_date' => 'required', 'to_date' => 'required'
         ]);
-        $fromDate = $request->input('from_date');
-        $toDate = $request->input('to_date');
+        $fromDate = Carbon::parse($request->input('from_date'));
+        $toDate = Carbon::parse($request->input('to_date'));
         $sessions = Session::where('started', '>=', $fromDate)
             ->where('ended', '!=', null)
             ->where('started', '<=', $toDate);
