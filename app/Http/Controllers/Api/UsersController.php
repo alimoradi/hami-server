@@ -299,4 +299,8 @@ class UsersController extends Controller
             echo 'Transaction canceled by user';
         }
     }
+    public function payments()
+    {
+        return auth()->user()->payments;
+    }
 }

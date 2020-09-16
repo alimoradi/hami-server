@@ -270,6 +270,7 @@ class SessionsController extends Controller
         }
         $confilictingProviderSessionsCount = Session::where('provider_id', $providerId)
             ->where('accepted', '!=', null)
+            ->where('ended', null)
             ->where(function ($q) use ($dateFrom, $dateTo) {
                 $q->where(function ($p) use ($dateFrom, $dateTo) {
                     $p->where('reserved_from', '>=', $dateFrom)->where('reserved_from', '<=', $dateTo);

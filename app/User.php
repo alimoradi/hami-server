@@ -144,16 +144,10 @@ class User extends Authenticatable
     public function deposit($amount)
     {
 
-        $invoice = new Invoice();
-        $invoice->created_at = Carbon::now();
-        $invoice->is_final = true;
-        $invoice->related_type = 2;
-        $invoice->is_pre_invoice = false;
-        $invoice->amount = $amount;
-        $invoice->user_id = $this->id;
-        $invoice->related_id = 0;
-        $invoice->save();
-        return $invoice;
+        $payment = $this->requestDeposit($amount, "0000");
+        $payment->verify("0000");
+        return $payment->invoice;
+
     }
     public function requestDeposit($amount, $authorityCode)
     {
@@ -165,7 +159,10 @@ class User extends Authenticatable
         $payment->createInvoice();
         return $payment;
     }
-    
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
     public function getAvatarThumbnailAttribute()
     {
         $directory = 'public/';
