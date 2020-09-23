@@ -198,4 +198,18 @@ class ProvidersController extends Controller
         return response()->json($thumbnailArray );
        
     }
+    public function makeSupervisor($providerId)
+    {
+        $provider = Provider::find($providerId);
+        $provider->is_supervisor = true;
+        $provider->save();
+        return response()->json(['success'=> true] );
+    }
+    public function unmakeSupervisor($providerId)
+    {
+        $provider = Provider::find($providerId);
+        $provider->is_supervisor = false;
+        $provider->save();
+        return response()->json(['success'=> true] );
+    }
 }

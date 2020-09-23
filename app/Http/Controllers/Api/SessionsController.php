@@ -143,6 +143,24 @@ class SessionsController extends Controller
         }
         return $sessions->get();
     }
+    public function getUserSessions($userId)
+    {
+        $user = User::find($userId);
+        
+        $sessions = null;
+        if ($user->role_id == User::USER_ROLE_ID) {
+            $sessions = Session::with(['provider', 'provider.user', 'user', 'provider.providerCategories'])
+                ->where('user_id', $user->id)
+                ->orderBy('created_at', 'DESC');
+        } else if ($user->role_id == User::PROVIDER_ROLE_ID) {
+            $sessions = Session::with(['provider', 'provider.user', 'user', 'provider.providerCategories'])
+                ->whereHas('provider.user', function ($query) use($user) {
+                    $query->where('id', '=', $user->id);
+                })
+                ->orderBy('created_at', 'DESC');
+        }
+        return $sessions->get();
+    }
 
     public function getPresentAndFutureSessions()
     {
@@ -331,6 +349,31 @@ class SessionsController extends Controller
     public function getById($sessionId)
     {
         return Session::find($sessionId)->with(['provider', 'provider.user', 'user', 'provider.providerCategories'])->find($session->id);
+
+    }
+    public function getSessionsState(Request $request)
+    {
+        $request->validate(
+            [
+                'session_ids' => 'required'
+            ]
+        );
+        $result = [];
+        $sessions = Session::select('id', 'started', 'accepted', 'ended', 'created_at')->whereIn('id', $request->input('session_ids'))->get();
+
+        foreach ($sessions as $key => $value) {
+            array_push($result, ['id'=> $value->id, 'state' => $value->state]);
+        }
+        
+        return $result;
+        
+    }
+    public function refer(Request $request, $sessionId)
+    {
+        $referNote = $request->input('refer_note');
+        $session = Session::find($sessionId);
+        $session->refer($referNote);
+        return response()->json(['success' => true]);
 
     }
 }

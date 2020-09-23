@@ -62,6 +62,9 @@ Route::namespace('Api')->group(function () {
 
             Route::get('getActivitySwitch', 'ProvidersController@getActivitySwitch');
             Route::get('providerStatsByStatus', 'ProvidersController@providerStatsByStatus');
+
+            Route::post('makeSupervisor/{providerId}', 'ProvidersController@makeSupervisor');
+            Route::post('unmakeSupervisor/{providerId}', 'ProvidersController@unmakeSupervisor');
         });
     });
     Route::prefix('calendar')->group(function () {
@@ -148,8 +151,11 @@ Route::namespace('Api')->group(function () {
 
             Route::get('getPastSessions', 'SessionsController@getPastSessions');
             Route::get('getById/{sessionId}', 'SessionsController@getSession');
+            Route::post('getSessionsState', 'SessionsController@getSessionsState');
 
+            Route::post('refer/{sessionId}', 'SessionsController@refer');
             Route::get('getSessions', 'SessionsController@getSessions');
+            Route::get('getUserSessions/{userId}', 'SessionsController@getUserSessions');
             Route::get('getActiveRequests', 'SessionsController@getActiveRequests');
             Route::post('checkRequestEligibility', 'SessionsController@checkRequestEligibility');
         });

@@ -10,4 +10,8 @@ class ProviderCategory extends Model
     {
         return $this->belongsToMany(Provider::class);
     }
+    public function supervisors()
+    {
+        return $this->providers()->where('is_supervisor', true)->get();
+    }
 }
