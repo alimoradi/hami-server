@@ -131,11 +131,11 @@ class SessionsController extends Controller
         $role = auth()->user()->checkRole();
         $sessions = null;
         if ($role == 'service_user') {
-            $sessions = Session::with(['provider', 'provider.user', 'user', 'provider.providerCategories'])
+            $sessions = Session::with(['provider', 'provider.user', 'user', 'provider.providerCategories', 'referral'])
                 ->where('user_id', auth()->user()->id)
                 ->orderBy('created_at', 'DESC');
         } else if ($role == 'service_provider') {
-            $sessions = Session::with(['provider', 'provider.user', 'user', 'provider.providerCategories'])
+            $sessions = Session::with(['provider', 'provider.user', 'user', 'provider.providerCategories', 'referral'])
                 ->whereHas('provider.user', function ($query) {
                     $query->where('id', '=', auth()->user()->id);
                 })
@@ -146,15 +146,15 @@ class SessionsController extends Controller
     public function getUserSessions($userId)
     {
         $user = User::find($userId);
-        
+
         $sessions = null;
         if ($user->role_id == User::USER_ROLE_ID) {
-            $sessions = Session::with(['provider', 'provider.user', 'user', 'provider.providerCategories'])
+            $sessions = Session::with(['provider', 'provider.user', 'user', 'provider.providerCategories', 'referral'])
                 ->where('user_id', $user->id)
                 ->orderBy('created_at', 'DESC');
         } else if ($user->role_id == User::PROVIDER_ROLE_ID) {
-            $sessions = Session::with(['provider', 'provider.user', 'user', 'provider.providerCategories'])
-                ->whereHas('provider.user', function ($query) use($user) {
+            $sessions = Session::with(['provider', 'provider.user', 'user', 'provider.providerCategories', 'referral'])
+                ->whereHas('provider.user', function ($query) use ($user) {
                     $query->where('id', '=', $user->id);
                 })
                 ->orderBy('created_at', 'DESC');
@@ -186,7 +186,7 @@ class SessionsController extends Controller
     }
     public function getPastSessions()
     {
-        $sessions = Session::with(['provider', 'provider.user', 'user', 'provider.providerCategories'])
+        $sessions = Session::with(['provider', 'provider.user', 'user', 'provider.providerCategories', 'referral'])
             ->where('ended', '!=', null)
             ->orderBy('started', 'DESC');
         if (auth()->user()->role_id == 2) {
@@ -220,7 +220,7 @@ class SessionsController extends Controller
     public function providerEndedSessions()
     {
 
-        return Session::with(['provider', 'provider.user', 'user', 'provider.providerCategories'])
+        return Session::with(['provider', 'provider.user', 'user', 'provider.providerCategories', 'referral'])
             ->whereHas('provider.user', function ($query) {
                 $query->where('id', '=', auth()->user()->id);
             })
@@ -333,6 +333,7 @@ class SessionsController extends Controller
         $user->notify(new SessionUpdated(json_encode($session), json_encode(auth()->user())));
         return response()->json(['success' => true]);
     }
+    
     public function updateScore(Request $request, $sessionId)
     {
         $request->validate(
@@ -348,8 +349,7 @@ class SessionsController extends Controller
     }
     public function getById($sessionId)
     {
-        return Session::find($sessionId)->with(['provider', 'provider.user', 'user', 'provider.providerCategories'])->find($session->id);
-
+        return Session::find($sessionId)->with(['provider', 'provider.user', 'user', 'provider.providerCategories', 'referral'])->find($session->id);
     }
     public function getSessionsState(Request $request)
     {
@@ -362,18 +362,10 @@ class SessionsController extends Controller
         $sessions = Session::select('id', 'started', 'accepted', 'ended', 'created_at')->whereIn('id', $request->input('session_ids'))->get();
 
         foreach ($sessions as $key => $value) {
-            array_push($result, ['id'=> $value->id, 'state' => $value->state]);
+            array_push($result, ['id' => $value->id, 'state' => $value->state]);
         }
-        
-        return $result;
-        
-    }
-    public function refer(Request $request, $sessionId)
-    {
-        $referNote = $request->input('refer_note');
-        $session = Session::find($sessionId);
-        $session->refer($referNote);
-        return response()->json(['success' => true]);
 
+        return $result;
     }
+    
 }

@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Storage;
 class User extends Authenticatable
 {
     use Notifiable, HasApiTokens;
-    protected $appends = ['avatar_thumbnail'];
+    protected $appends = ['avatar_thumbnail', 'is_supervisor'];
 
 
     public function findForPassport($username)
@@ -208,6 +208,14 @@ class User extends Authenticatable
             'size' => $size,
             'extension' => $extension
         ];
+    }
+    public function getIsSupervisorAttribute()
+    {
+        if($this->role_id == User::PROVIDER_ROLE_ID)
+        {
+            return $this->provider->is_supervisor;
+        }
+        return false;
     }
     private function saveAvatarThumbnail($image, $directory, $name)
     {

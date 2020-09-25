@@ -3,11 +3,13 @@
 namespace App;
 
 use App\Libraries\Notifications\NewRefer;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Mockery\Undefined;
 
 class Session extends Model
 {
-    protected $appends = ['state'];
+    protected $appends = ['state', 'is_referred', 'referral_status'];
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -15,6 +17,25 @@ class Session extends Model
     public function provider()
     {
         return $this->belongsTo(Provider::class);
+    }
+    public function getReferralStatusAttribute()
+    {
+        if(!$this->referral)
+        {
+            return Session::SESSION_REFERRAL_STATUS_NOT_REFERRED;
+        }
+        if($this->referral->surveyed_at == null)
+        {
+            return Session::SESSION_REFERRAL_STATUS_REFERRED;
+        }
+        if($this->referral->refund_confirmed == true)
+        {
+            return Session::SESSION_REFERRAL_STATUS_CONFIRMED;
+        }
+        if($this->referral->refund_confirmed == false)
+        {
+            return Session::SESSION_REFERRAL_STATUS_REJECTED;
+        }
     }
     public function getStateAttribute()
     {
@@ -34,10 +55,30 @@ class Session extends Model
             return Session::SESSION_STATE_REJECTED;
           }
     }
-    public function refer($referNote)
+    public function referral()
     {
-        $this->is_referred = true;
-        $this->refer_note = $referNote;
+        return $this->hasOne(SessionReferral::class);
+    }
+    public function getIsReferredAttribute()
+    {
+        if($this->referral)
+        {
+            return true;
+        }
+        return false;
+    }
+    public function refer($referNote, $referrer)
+    {
+        
+        $referral = new SessionReferral();
+        $referral->note = $referNote;
+        $referral->referrer_id = $referrer->id;
+        $referral->session_id = $this->id;
+        $referral->save();
+        if($this->ended == null)
+        {
+            $this->ended = Carbon::now();
+        }
         $this->save();
         $supervisorArray = [];
         $provider = $this->provider;
@@ -50,7 +91,7 @@ class Session extends Model
             })->get();
         foreach($supervisors as $supervisor)
         {
-            $supervisor->user->notify(new NewRefer($this));
+            $supervisor->user->notify(new NewRefer(json_encode($this)));
         }
         
     }
@@ -81,4 +122,9 @@ class Session extends Model
     public const SESSION_STATE_ACTIVE = 2;
     public const SESSION_STATE_ENDED = 3;
     public const SESSION_STATE_REJECTED = 4;
+
+    public const SESSION_REFERRAL_STATUS_NOT_REFERRED = 0;
+    public const SESSION_REFERRAL_STATUS_REFERRED = 1;
+    public const SESSION_REFERRAL_STATUS_CONFIRMED = 2;
+    public const SESSION_REFERRAL_STATUS_REJECTED = 3;
 }
