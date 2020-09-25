@@ -12,4 +12,5 @@ npm-debug.log
 yarn-error.log
 /tinode/tinode.conf
 /storage
-
+docker-compose.yml
+nginx/conf.d/app.conf
