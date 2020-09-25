@@ -59,7 +59,7 @@ services:
       - "3306:3306"
     environment:
       MYSQL_DATABASE: hami-server
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: yendisaim
       SERVICE_TAGS: dev
       SERVICE_NAME: mysql
     volumes:
@@ -88,7 +88,7 @@ services:
     tty: true
     ports:
       - "8080:6060"
-    environment: 
+    environment:
       EXT_CONFIG: ./conf/tinode.conf
     volumes:
       - ../hami-persistent/tinode/:/opt/tinode/conf
