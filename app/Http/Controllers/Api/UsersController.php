@@ -24,7 +24,7 @@ class UsersController extends Controller
 {
     public function me()
     {
-        return User::with(['sessionSubscriptions', 'p2pSubscriptions', 'mustSubscriptions'])->find(auth()->user()->id);
+        return User::with(['provider','sessionSubscriptions', 'p2pSubscriptions', 'mustSubscriptions'])->find(auth()->user()->id);
     }
     public function getById($id)
     {
