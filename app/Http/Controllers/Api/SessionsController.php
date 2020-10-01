@@ -349,7 +349,7 @@ class SessionsController extends Controller
     }
     public function getById($sessionId)
     {
-        return Session::find($sessionId)->with(['provider', 'provider.user', 'user', 'provider.providerCategories', 'referral'])->find($session->id);
+        return Session::find($sessionId)->with(['provider', 'provider.user', 'user', 'provider.providerCategories', 'referral'])->find($sessionId);
     }
     public function getSessionsState(Request $request)
     {
