@@ -150,7 +150,7 @@ Route::namespace('Api')->group(function () {
             Route::get('getProviderPresentAndFutureSessions/{providerId}', 'SessionsController@getProviderPresentAndFutureSessions');
 
             Route::get('getPastSessions', 'SessionsController@getPastSessions');
-            Route::get('getById/{sessionId}', 'SessionsController@getSession');
+            Route::get('getById/{sessionId}', 'SessionsController@getById');
             Route::post('getSessionsState', 'SessionsController@getSessionsState');
             Route::post('refer/{sessionId}', 'ReferralsController@refer');
             Route::get('referredToMe', 'ReferralsController@referredToMe');
