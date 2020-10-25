@@ -73,15 +73,19 @@ class User extends Authenticatable
     }
     public function p2pPeers()
     {
-        return User::whereHas('p2pSubscriptions', function ($query) {
-            $query->whereHas('topic.subscribers', function ($query) {
-                $query->where('user_id', '!=', $this->id);
-            });
-        })->get();
+        $topicIds = $this->p2pSubscriptions()->pluck('topic_id')->toArray() ;
+        $uids =$this->livePeerTopics()->pluck('topics.name')->toArray();
+        return User::whereIn('tinode_uid', $uids)->get();
     }
     public function topics()
     {
-        return $this->hasMany(Topic::class);
+        return $this->belongsToMany(Topic::class, 'subscriptions');
+    }
+    public function livePeerTopics()
+    {
+        return $this->belongsToMany(Topic::class, 'subscriptions')
+        ->where('type', Topic::TOPIC_TYPE_PEER)
+        ->wherePivot('unsubscribed_at', '=', null)->distinct();
     }
     public function sessionSubscriptions()
     {
