@@ -73,7 +73,6 @@ class User extends Authenticatable
     }
     public function p2pPeers()
     {
-        $topicIds = $this->p2pSubscriptions()->pluck('topic_id')->toArray() ;
         $uids =$this->livePeerTopics()->pluck('topics.name')->toArray();
         return User::whereIn('tinode_uid', $uids)->get();
     }

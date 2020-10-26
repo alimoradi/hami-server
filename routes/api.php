@@ -60,6 +60,9 @@ Route::namespace('Api')->group(function () {
             Route::post('activitySwitchOn', 'ProvidersController@activitySwitchOn');
             Route::post('activitySwitchOff', 'ProvidersController@activitySwitchOff');
 
+            Route::post('selfDeactivate', 'ProvidersController@selfDeactivate');
+            Route::post('selfActivate', 'ProvidersController@selfActivate');
+
             Route::get('getActivitySwitch', 'ProvidersController@getActivitySwitch');
             Route::get('providerStatsByStatus', 'ProvidersController@providerStatsByStatus');
 

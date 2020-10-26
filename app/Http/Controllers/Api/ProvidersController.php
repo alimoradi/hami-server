@@ -15,7 +15,10 @@ class ProvidersController extends Controller
 {
     public function getByCategoryId($categoryId)
     {
-        return ProviderCategory::find($categoryId)->providers()->with(['user', 'providerCategories', 'providerVerificationDocuments'])->get();
+        return ProviderCategory::find($categoryId)->providers()
+        ->where('verified_by_admin', true)
+        ->where('self_deactivated', false)
+        ->with(['user', 'providerCategories', 'providerVerificationDocuments'])->get();
         return ProviderCategory::with(['user', 'providerCategories', 'providerVerificationDocuments'])->where('provider_category_id', $categoryId)->get();
     }
     public function getByUserId($userId)
@@ -170,6 +173,20 @@ class ProvidersController extends Controller
     {
         $provider = Provider::where('user_id', auth()->user()->id)->first();
         $provider->activity_switch = false;
+        $provider->save();
+        return response()->json(['success'=> true] );
+    }
+    public function selfDeactivate()
+    {
+        $provider = Provider::where('user_id', auth()->user()->id)->first();
+        $provider->self_deactivated = true;
+        $provider->save();
+        return response()->json(['success'=> true] );
+    }
+    public function selfActivate()
+    {
+        $provider = Provider::where('user_id', auth()->user()->id)->first();
+        $provider->self_deactivated = false;
         $provider->save();
         return response()->json(['success'=> true] );
     }
