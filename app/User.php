@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Storage;
 class User extends Authenticatable
 {
     use Notifiable, HasApiTokens;
-    protected $appends = ['avatar_thumbnail', 'is_supervisor'];
+    protected $appends = ['avatar_thumbnail', 'is_supervisor', 'affiliate_code'];
 
 
     public function findForPassport($username)
@@ -97,19 +97,15 @@ class User extends Authenticatable
     }
     public function sessions()
     {
-        $role = $this->checkRole();
         
-        if ($role == 'service_user') {
+        if ($this->role_id == User::USER_ROLE_ID) {
             return $this->hasMany(Session::class)
             ->with(['provider', 'provider.user', 'user', 'provider.providerCategories', 'referral'])
-            ->where('user_id', auth()->user()->id)
             ->orderBy('created_at', 'DESC');
-        } else if ($role == 'service_provider') {
-            return $this->hasMany(Session::class)
+        } else if ($this->role_id == User::PROVIDER_ROLE_ID) {
+            $id = $this->id;
+            return $this->hasManyThrough(Session::class, Provider::class, 'user_id', 'provider_id', 'id', 'id')
                 ->with(['provider', 'provider.user', 'user', 'provider.providerCategories', 'referral'])
-                ->whereHas('provider.user', function ($query) {
-                    $query->where('id', '=', auth()->user()->id);
-                })
                 ->orderBy('created_at', 'DESC');
         }
     }
@@ -268,6 +264,23 @@ class User extends Authenticatable
 
         Storage::putFileAs($directory, $image, User::AVATAR_THUMBNAIL_PREFIX . $name);
     }
+    public function getAffiliateCodeAttribute()
+    {
+        if($this->affiliate_code_private != null && $this->affiliate_code_private != "")
+        {
+            return $this->affiliate_code_private;
+        }
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyz';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+        for ($i = 0; $i < 8; $i++) {
+            $randomString .= $characters[rand(0, $charactersLength - 1)];
+        }
+        $this->affiliate_code_private = $randomString;
+        $this->save();
+        return $this->affiliate_code_private;
+    }
+
     /**
      * The attributes that are mass assignable.
      *
@@ -283,7 +296,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password', 'remember_token','affiliate_code_private',
     ];
 
     /**

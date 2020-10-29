@@ -342,7 +342,7 @@ class SessionsController extends Controller
     {
         
         $result = [];
-        $sessions = auth()->user()->sessions()->select('id', 'started', 'accepted', 'ended', 'created_at')->get();
+        $sessions = auth()->user()->sessions()->select('sessions.id', 'sessions.started', 'sessions.accepted', 'sessions.ended', 'sessions.created_at')->get();
 
         foreach ($sessions as $key => $value) {
             array_push($result, ['id' => $value->id, 'state' => $value->state]);

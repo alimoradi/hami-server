@@ -8,7 +8,7 @@ class Affiliation extends Model
 {
     public static function createAffiliation($userId, $affiliateCode)
     {
-        $affiliateId = User::where('phone', $affiliateCode)->first()->id;
+        $affiliateId = User::where('affiliate_code_private', $affiliateCode)->first()->id;
         $affiliation = new Affiliation();
         $affiliation->visitor_id = $userId;
         $affiliation->affiliate_id = $affiliateId;
