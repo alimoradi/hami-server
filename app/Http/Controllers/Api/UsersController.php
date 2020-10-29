@@ -61,6 +61,7 @@ class UsersController extends Controller
         $info->national_code = $request->input('national_code');
         $info->land_line_number = $request->input('land_line_number');
         $info->postal_code = $request->input('postal_code');
+        $info->debit_card_number = $request->input('debit_card_number');
         $info->save();
 
         return $info;
