@@ -95,6 +95,24 @@ class User extends Authenticatable
                 $query->where('type', '=', 2);
             })->with(['topic', 'topic.subscribers']);
     }
+    public function sessions()
+    {
+        $role = $this->checkRole();
+        
+        if ($role == 'service_user') {
+            return $this->hasMany(Session::class)
+            ->with(['provider', 'provider.user', 'user', 'provider.providerCategories', 'referral'])
+            ->where('user_id', auth()->user()->id)
+            ->orderBy('created_at', 'DESC');
+        } else if ($role == 'service_provider') {
+            return $this->hasMany(Session::class)
+                ->with(['provider', 'provider.user', 'user', 'provider.providerCategories', 'referral'])
+                ->whereHas('provider.user', function ($query) {
+                    $query->where('id', '=', auth()->user()->id);
+                })
+                ->orderBy('created_at', 'DESC');
+        }
+    }
     public function mustSubscriptions()
     {
         return $this->hasMany(Subscription::class)

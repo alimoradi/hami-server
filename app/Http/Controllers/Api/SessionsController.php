@@ -128,20 +128,7 @@ class SessionsController extends Controller
     }
     public function getSessions()
     {
-        $role = auth()->user()->checkRole();
-        $sessions = null;
-        if ($role == 'service_user') {
-            $sessions = Session::with(['provider', 'provider.user', 'user', 'provider.providerCategories', 'referral'])
-                ->where('user_id', auth()->user()->id)
-                ->orderBy('created_at', 'DESC');
-        } else if ($role == 'service_provider') {
-            $sessions = Session::with(['provider', 'provider.user', 'user', 'provider.providerCategories', 'referral'])
-                ->whereHas('provider.user', function ($query) {
-                    $query->where('id', '=', auth()->user()->id);
-                })
-                ->orderBy('created_at', 'DESC');
-        }
-        return $sessions->get();
+        return auth()->user()->sessions;
     }
     public function getUserSessions($userId)
     {
@@ -353,13 +340,9 @@ class SessionsController extends Controller
     }
     public function getSessionsState(Request $request)
     {
-        $request->validate(
-            [
-                'session_ids' => 'required'
-            ]
-        );
+        
         $result = [];
-        $sessions = Session::select('id', 'started', 'accepted', 'ended', 'created_at')->whereIn('id', $request->input('session_ids'))->get();
+        $sessions = auth()->user()->sessions()->select('id', 'started', 'accepted', 'ended', 'created_at')->get();
 
         foreach ($sessions as $key => $value) {
             array_push($result, ['id' => $value->id, 'state' => $value->state]);
