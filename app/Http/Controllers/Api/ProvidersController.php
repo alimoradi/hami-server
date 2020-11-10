@@ -48,6 +48,13 @@ class ProvidersController extends Controller
         $provider->save();
         return response()->json(['success' => true]);
     }
+    public function unverifyProvider($providerId)
+    {
+        $provider = Provider::find($providerId);
+        $provider->verified_by_admin = false;
+        $provider->save();
+        return response()->json(['success' => true]);
+    }
     public function downloadVerificationDocument($name)
     {
 
