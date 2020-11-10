@@ -53,6 +53,8 @@ Route::namespace('Api')->group(function () {
             Route::get('getByUserId/{userId}', 'ProvidersController@getByUserId');
 
             Route::post('verify/{providerId}', 'ProvidersController@verifyProvider');
+
+            Route::post('unverify/{providerId}', 'ProvidersController@unverifyProvider');
             Route::post('updateProviderInfo/{providerId}', 'ProvidersController@updateProviderInfo');
 
             Route::post('updateAboutMe/{providerId}', 'ProvidersController@updateAboutMe');
