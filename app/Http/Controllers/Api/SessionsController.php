@@ -197,10 +197,10 @@ class SessionsController extends Controller
             ->where('ended', '!=', null)
             ->where('started', '<=', $toDate);
         if ($user->role_id == User::USER_ROLE_ID) {
-            $sessions = $sessions->where('user_id', auth()->user()->id);
+            $sessions = $sessions->where('user_id', $user->id);
         } else if ($user->role_id == User::PROVIDER_ROLE_ID) {
-            $sessions = $sessions->whereHas('provider.user', function ($query) {
-                $query->where('id', '=', auth()->user()->id);
+            $sessions = $sessions->whereHas('provider.user', function ($query) use($user) {
+                $query->where('id', '=', $user->id);
             });
         }
         return $sessions->get();
