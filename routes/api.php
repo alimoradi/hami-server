@@ -143,7 +143,7 @@ Route::namespace('Api')->group(function () {
             Route::post('start/{sessionId}', 'SessionsController@start');
             Route::post('accept/{sessionId}', 'SessionsController@accept');
             Route::post('end/{sessionId}', 'SessionsController@end');
-            Route::post('selectRangeByDate', 'SessionsController@selectRangeByDate');
+            Route::post('selectRangeByDate/{userId}', 'SessionsController@selectRangeByDate');
             Route::get('userActiveSessions', 'SessionsController@userActiveSessions');
             Route::get('userEndedSessions', 'SessionsController@userEndedSessions');
             Route::get('userRequestedSessions', 'SessionsController@userRequestedSessions');

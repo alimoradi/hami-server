@@ -185,19 +185,20 @@ class SessionsController extends Controller
         }
         return $sessions->get();
     }
-    public function selectRangeByDate(Request $request)
+    public function selectRangeByDate($userId, Request $request)
     {
         $request->validate([
             'from_date' => 'required', 'to_date' => 'required'
         ]);
+        $user = User::find($userId);
         $fromDate = Carbon::parse($request->input('from_date'));
         $toDate = Carbon::parse($request->input('to_date'));
         $sessions = Session::where('started', '>=', $fromDate)
             ->where('ended', '!=', null)
             ->where('started', '<=', $toDate);
-        if (auth()->user()->role_id == 2) {
+        if ($user->role_id == User::USER_ROLE_ID) {
             $sessions = $sessions->where('user_id', auth()->user()->id);
-        } else if (auth()->user()->role_id == 1) {
+        } else if ($user->role_id == User::PROVIDER_ROLE_ID) {
             $sessions = $sessions->whereHas('provider.user', function ($query) {
                 $query->where('id', '=', auth()->user()->id);
             });
