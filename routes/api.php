@@ -114,7 +114,8 @@ Route::namespace('Api')->group(function () {
             Route::get('getAdditionalInfo/{userId}', 'UsersController@getAdditionalInfo');
             Route::get('getBalance', 'UsersController@getBalance');
             Route::post('deposit', 'UsersController@deposit');
-            Route::get('payments', 'UsersController@payments');
+            Route::get('payments/{userId}', 'UsersController@payments');
+
             Route::get('getAll', 'UsersController@getAll');
         });
     });

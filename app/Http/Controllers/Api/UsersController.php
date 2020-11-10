@@ -300,8 +300,9 @@ class UsersController extends Controller
             echo 'Transaction canceled by user';
         }
     }
-    public function payments()
+    public function payments($userId)
     {
-        return auth()->user()->payments;
+        $user = User::find($userId);
+        return $user->payments;
     }
 }
