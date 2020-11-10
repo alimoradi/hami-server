@@ -193,13 +193,14 @@ class SessionsController extends Controller
         $user = User::find($userId);
         $fromDate = Carbon::parse($request->input('from_date'));
         $toDate = Carbon::parse($request->input('to_date'));
-        $sessions = Session::where('started', '>=', $fromDate)
+        $sessions = Session::with(['provider', 'provider.user', 'user', 'provider.providerCategories', 'referral'])
+            ->where('started', '>=', $fromDate)
             ->where('ended', '!=', null)
             ->where('started', '<=', $toDate);
         if ($user->role_id == User::USER_ROLE_ID) {
             $sessions = $sessions->where('user_id', $user->id);
         } else if ($user->role_id == User::PROVIDER_ROLE_ID) {
-            $sessions = $sessions->whereHas('provider.user', function ($query) use($user) {
+            $sessions = $sessions->whereHas('provider.user', function ($query) use ($user) {
                 $query->where('id', '=', $user->id);
             });
         }
@@ -321,7 +322,7 @@ class SessionsController extends Controller
         $user->notify(new SessionUpdated(json_encode($session), json_encode(auth()->user())));
         return response()->json(['success' => true]);
     }
-    
+
     public function updateScore(Request $request, $sessionId)
     {
         $request->validate(
@@ -341,7 +342,7 @@ class SessionsController extends Controller
     }
     public function getSessionsState(Request $request)
     {
-        
+
         $result = [];
         $sessions = auth()->user()->sessions()->select('sessions.id', 'sessions.started', 'sessions.accepted', 'sessions.ended', 'sessions.created_at')->get();
 
@@ -351,5 +352,4 @@ class SessionsController extends Controller
 
         return $result;
     }
-    
 }
