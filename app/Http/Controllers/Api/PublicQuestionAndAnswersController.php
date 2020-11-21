@@ -39,7 +39,7 @@ class PublicQuestionAndAnswersController extends Controller
         return PublicQuestionAndAnswers::where('question_id', null)
             ->where('user_id', $userId)
             ->where('created_at', '>=', $fromDate)
-            ->where('created_at', '<=', $toDate);
+            ->where('created_at', '<=', $toDate)
             ->count();
 
     }
