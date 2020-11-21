@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\PublicQuestionAndAnswers;
+use App\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class PublicQuestionAndAnswersController extends Controller
@@ -23,6 +25,22 @@ class PublicQuestionAndAnswersController extends Controller
     {
         return PublicQuestionAndAnswers::where('question_id', null)
             ->where('user_id', auth()->user()->id)->get();
+
+    }
+    public function answersCount($userId, Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required', 'from_date' => 'required', 'to_date' => 'required'
+        ]);
+        $fromDate = Carbon::parse($request->input('from_date'));
+        $toDate = Carbon::parse($request->input('to_date'));
+
+
+        return PublicQuestionAndAnswers::where('question_id', null)
+            ->where('user_id', $userId)
+            ->where('created_at', '>=', $fromDate)
+            ->where('created_at', '<=', $toDate);
+            ->count();
 
     }
     public function ask(Request $request)
