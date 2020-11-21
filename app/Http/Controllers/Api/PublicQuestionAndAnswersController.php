@@ -36,7 +36,7 @@ class PublicQuestionAndAnswersController extends Controller
         $toDate = Carbon::parse($request->input('to_date'));
 
 
-        return PublicQuestionAndAnswers::where('question_id', null)
+        return PublicQuestionAndAnswers::where('question_id', '!=', null)
             ->where('user_id', $userId)
             ->where('created_at', '>=', $fromDate)
             ->where('created_at', '<=', $toDate)
