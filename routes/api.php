@@ -134,7 +134,7 @@ Route::namespace('Api')->group(function () {
             Route::get('getMyQuestions', 'PublicQuestionAndAnswersController@getMyQuestions');
             Route::post('ask', 'PublicQuestionAndAnswersController@ask');
             Route::post('answer', 'PublicQuestionAndAnswersController@answer');
-            Route::post('answersCount/{userId}', 'PublicQuestionAndAnswersController@answersReport');
+            Route::post('answersCount/{userId}', 'PublicQuestionAndAnswersController@answersCount');
 
         });
     });
