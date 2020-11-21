@@ -30,7 +30,7 @@ class PublicQuestionAndAnswersController extends Controller
     public function answersCount($userId, Request $request)
     {
         $request->validate([
-            'user_id' => 'required', 'from_date' => 'required', 'to_date' => 'required'
+            'from_date' => 'required', 'to_date' => 'required'
         ]);
         $fromDate = Carbon::parse($request->input('from_date'));
         $toDate = Carbon::parse($request->input('to_date'));
