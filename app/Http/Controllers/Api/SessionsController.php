@@ -89,7 +89,7 @@ class SessionsController extends Controller
         $session->ended = Carbon::now();
         $session->save();
         $session = Session::find($sessionId);
-        $session->started = Carbon::now();
+        //$session->started = Carbon::now();
         $session->save();
         if (Session::where('provider_id', $session->provider->id)
             ->where('user_id', $session->user->id)

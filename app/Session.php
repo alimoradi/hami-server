@@ -42,14 +42,17 @@ class Session extends Model
         if ($this->accepted == null && $this->ended == null) {
             return Session::SESSION_STATE_REQUESTED;
           }
-          if ($this->accepted != null && $this->started == null) {
+          if ($this->accepted != null && $this->started == null && $this->ended == null) {
             return Session::SESSION_STATE_RESERVED;
           }
           if ($this->started != null && $this->ended == null) {
             return Session::SESSION_STATE_ACTIVE;
           }
-          if ($this->accepted != null && $this->ended != null) {
+          if ($this->started != null && $this->ended != null) {
             return Session::SESSION_STATE_ENDED;
+          }
+          if ($this->accepted != null && $this->started == null && $this->ended != null) {
+            return Session::SESSION_STATE_CANCELED;
           }
           if ($this->accepted == null && $this->ended != null) {
             return Session::SESSION_STATE_REJECTED;
@@ -69,7 +72,7 @@ class Session extends Model
     }
     public function refer($referNote, $referrer)
     {
-        
+
         $referral = new SessionReferral();
         $referral->note = $referNote;
         $referral->referrer_id = $referrer->id;
@@ -93,7 +96,7 @@ class Session extends Model
         {
             $supervisor->user->notify(new NewRefer(json_encode($this)));
         }
-        
+
     }
     public function invoice()
     {
@@ -122,6 +125,7 @@ class Session extends Model
     public const SESSION_STATE_ACTIVE = 2;
     public const SESSION_STATE_ENDED = 3;
     public const SESSION_STATE_REJECTED = 4;
+    public const SESSION_STATE_CANCELED = 5;
 
     public const SESSION_REFERRAL_STATUS_NOT_REFERRED = 0;
     public const SESSION_REFERRAL_STATUS_REFERRED = 1;
