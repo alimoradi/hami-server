@@ -12,6 +12,7 @@ use App\Payment;
 use App\Provider;
 use App\ProviderCategory;
 use App\Session;
+use App\SessionCall;
 use App\Subscription;
 use App\Topic;
 use App\User;
@@ -201,13 +202,15 @@ class UsersController extends Controller
         $request->validate(
             [
                 'receptor_user_id' => 'required',
-                'max_duration' => 'required'
+                'session_id' => 'required',
+
             ]
         );
         $callerUsername = auth()->user()->phone;
         $receptor = User::find($request->input('receptor_user_id'));
         $receptorUsername = $receptor->phone;
-        $maxDuration = $request->input('max_duration');
+        $sessionId = $request->input('session_id');
+        $maxDuration = SessionCall::calculateMaxDuration($sessionId);
         $call = $callMaker->createCall($callerUsername, $receptorUsername, $maxDuration);
 
 
@@ -216,7 +219,14 @@ class UsersController extends Controller
             $callerAccessToken = $call->caller->accessToken;
             $receptorAccessToken = $call->receptor->accessToken;;
             $receptor->notify(new IncomingCall($receptorAccessToken, $callId, json_encode(auth()->user()), strval($maxDuration)));
-            return response()->json(['id' => $callId, 'access_token' => $callerAccessToken]);
+            SessionCall::saveCall($callId
+                , auth()->user()->idate
+                , $receptor->id
+                , $sessionId
+                , $callerAccessToken
+                , $receptorAccessToken
+                , $maxDuration);
+            return response()->json(['id' => $callId,'sessionId'=> $sessionId, 'maxDuration'=> $maxDuration,  'access_token' => $callerAccessToken]);
         }
         return response()->json('', 404);
     }
@@ -274,7 +284,7 @@ class UsersController extends Controller
     public function paymentCallback()
     {
         $MerchantID = 'abc437bf-29c0-4580-b4d7-618b4eff3a70';
-        
+
         $Authority = $_GET['Authority'];
         $payment = Payment::getPaymentByAuthorityCode( $Authority);
         $Amount = $payment->amount;
