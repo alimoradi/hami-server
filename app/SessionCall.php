@@ -32,8 +32,29 @@ class SessionCall extends Model
         $call->receptor_id = $receptorId;
         $call->session_id = $sessionId;
         $call->caller_access_token = $callerToken;
-        $call->receptro_access_token = $receptorToken;
+        $call->receptor_access_token = $receptorToken;
         $call->max_duration = $maxDuration;
         $call->save();
     }
+    public static function callStarted($id, $time)
+    {
+        $call = SessionCall::find($id);
+        if($call->started == null)
+        {
+            $call->started_at = $time;
+            $call->save();
+        }
+
+    }
+    public static function callEnded($id, $time)
+    {
+        $call = SessionCall::find($id);
+        if($call->ended_at == null)
+        {
+            $call->ended_at = $time;
+            $call->save();
+        }
+
+    }
+
 }

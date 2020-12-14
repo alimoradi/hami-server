@@ -220,7 +220,7 @@ class UsersController extends Controller
             $receptorAccessToken = $call->receptor->accessToken;;
             $receptor->notify(new IncomingCall($receptorAccessToken, $callId, json_encode(auth()->user()), strval($maxDuration)));
             SessionCall::saveCall($callId
-                , auth()->user()->idate
+                , auth()->user()->id
                 , $receptor->id
                 , $sessionId
                 , $callerAccessToken
@@ -229,6 +229,34 @@ class UsersController extends Controller
             return response()->json(['id' => $callId,'sessionId'=> $sessionId, 'maxDuration'=> $maxDuration,  'access_token' => $callerAccessToken]);
         }
         return response()->json('', 404);
+    }
+    public function callStarted(Request $request)
+    {
+        $request->validate(
+            [
+                'id' => 'required',
+                'time' => 'required',
+
+            ]
+        );
+        $id = $request->input('id');
+        $time = Carbon::parse($request->input('id'));
+        return SessionCall::callStarted($id, $time);
+
+    }
+    public function callEnded(Request $request)
+    {
+        $request->validate(
+            [
+                'id' => 'required',
+                'time' => 'required',
+
+            ]
+        );
+        $id = $request->input('id');
+        $time = Carbon::parse($request->input('id'));
+        return SessionCall::callEnded($id, $time);
+
     }
     public function getPeers()
     {

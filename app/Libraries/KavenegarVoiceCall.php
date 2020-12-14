@@ -29,7 +29,7 @@ class KavenegarVoiceCall implements VoiceCallMaker
         $client = new Client(['headers' => [
             'Authorization' => 'Bearer ' . $this->apiToken
         ]]);
-            
+
         $res = $client->request('POST', $url, ['json' => ['caller' => [
             'username' => $callerUsername,
             'displayName' => 'anonymous'
@@ -41,6 +41,6 @@ class KavenegarVoiceCall implements VoiceCallMaker
             return false;
 
         return json_decode($res->getBody());
-       
+
     }
 }
