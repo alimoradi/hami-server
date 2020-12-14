@@ -240,7 +240,7 @@ class UsersController extends Controller
             ]
         );
         $id = $request->input('id');
-        $time = Carbon::parse($request->input('id'));
+        $time = Carbon::parse($request->input('time'));
         return SessionCall::callStarted($id, $time);
 
     }
@@ -254,7 +254,7 @@ class UsersController extends Controller
             ]
         );
         $id = $request->input('id');
-        $time = Carbon::parse($request->input('id'));
+        $time = Carbon::parse($request->input('time'));
         return SessionCall::callEnded($id, $time);
 
     }

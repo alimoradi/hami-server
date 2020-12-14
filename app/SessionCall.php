@@ -44,7 +44,7 @@ class SessionCall extends Model
             $call->started_at = $time;
             $call->save();
         }
-
+        return $call;
     }
     public static function callEnded($id, $time)
     {
@@ -54,7 +54,7 @@ class SessionCall extends Model
             $call->ended_at = $time;
             $call->save();
         }
-
+        return $call;
     }
 
 }
