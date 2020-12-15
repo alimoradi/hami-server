@@ -20,7 +20,8 @@ class FileController extends Controller
             "image/png",
             "image/svg",
             "image/svg+xml",
-            "auido/webm"
+            "auido/webm",
+            "application/pdf"
           ];
         $extensions=[
             "webm"
@@ -52,11 +53,11 @@ class FileController extends Controller
         'Access-Control-Allow-Headers'=> 'Content-Type, X-Auth-Token, Origin, Content-Type,Authorization',
         'Access-Control-Allow-Methods'=> 'GET, POST, PUT, DELETE, OPTIONS'
     ]);
-        
+
     }
     public function uploadAvatar(Request $request)
     {
-        
+
         $mimeTypes = [
             "image/jpeg",
             "image/png"
@@ -75,23 +76,23 @@ class FileController extends Controller
         {
             abort(415, "Unsupported Media Type");
         }
-        
+
        $result =  auth()->user()->saveAvatar($image);
         return response()->json($result,200,[
         'Access-Control-Allow-Origin'=> '*',
         'Access-Control-Allow-Headers'=> 'Content-Type, X-Auth-Token, Origin, Content-Type,Authorization',
         'Access-Control-Allow-Methods'=> 'GET, POST, PUT, DELETE, OPTIONS'
     ]);
-        
+
     }
     public function downloadMessageFile($name)
     {
         Log::info('called download');
         $directory = 'message_files/';
         $image = Storage::url($directory.$name);
-        
-        
-        
+
+
+
         return response()->download(Storage::path($directory) .$name,null,
         [
             'Access-Control-Allow-Origin'=> '*',
