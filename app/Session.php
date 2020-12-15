@@ -9,7 +9,7 @@ use Mockery\Undefined;
 
 class Session extends Model
 {
-    protected $appends = ['state', 'is_referred', 'referral_status'];
+    protected $appends = ['state', 'is_referred', 'referral_status', 'used_seconds'];
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -36,6 +36,10 @@ class Session extends Model
         {
             return Session::SESSION_REFERRAL_STATUS_REJECTED;
         }
+    }
+    function getUsedSecondsAttribute()
+    {
+        return $this->duration * 60 - SessionCall::calculateMaxDuration($this->id);
     }
     public function getStateAttribute()
     {

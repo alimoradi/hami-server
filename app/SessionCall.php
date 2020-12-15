@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class SessionCall extends Model
 {
+    protected $appends = ['duration'];
     public static function calculateMaxDuration($sessionId)
     {
         $sessionDuration = Session::find($sessionId)->duration * 60;
@@ -14,14 +15,16 @@ class SessionCall extends Model
         $pastDuration = 0;
         foreach ($calls as $call) {
             $pastDuration += $call->duration;
+            //var_dump($call->id);
         }
         return $sessionDuration - $pastDuration;
 
     }
-    public function getDurationAtribute()
+    public function getDurationAttribute()
     {
         $beginDate = Carbon::parse($this->started_at);
         $endDate = Carbon::parse($this->ended_at);
+        //var_dump($this->ended_at);
         return $endDate->diffInSeconds($beginDate);
     }
     public static function saveCall($id, $callerId, $receptorId, $sessionId, $callerToken, $receptorToken, $maxDuration)
