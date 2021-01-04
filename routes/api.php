@@ -106,6 +106,7 @@ Route::namespace('Api')->group(function () {
     });
     Route::get('stats', 'UsersController@stats');
     Route::get('config', 'UsersController@config');
+    Route::get('checkForUpdates', 'AppController@checkForUpdates');
     Route::prefix('users')->group(function () {
         Route::post('tempInvoiceCreate', 'UsersController@tempInvoiceCreate');
         Route::middleware('auth:api')->group(function () {
