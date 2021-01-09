@@ -292,7 +292,7 @@ class UsersController extends Controller
         $Amount = $amount;
         $Description = 'افزایش اعتبار'; // Required
         $Mobile = auth()->user()->phone;
-        $CallbackURL = 'http://51.210.61.202/api/payment/paymentCallback'; // Required
+        $CallbackURL = 'http://193.141.64.116:81/api/payment/paymentCallback'; // Required
         $client = new SoapClient('https://www.zarinpal.com/pg/services/WebGate/wsdl', ['encoding' => 'UTF-8']);
         $result = $client->PaymentRequest(
             [
