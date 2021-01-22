@@ -97,7 +97,7 @@ class User extends Authenticatable
     }
     public function sessions()
     {
-        
+
         if ($this->role_id == User::USER_ROLE_ID) {
             return $this->hasMany(Session::class)
             ->with(['provider', 'provider.user', 'user', 'provider.providerCategories', 'referral'])
@@ -158,11 +158,11 @@ class User extends Authenticatable
         $sub->save();
         return $sub;
     }
-    public function deposit($amount)
+    public function deposit($amount, $skipTempDiscount = false)
     {
 
         $payment = $this->requestDeposit($amount, "0000");
-        $payment->verify("0000");
+        $payment->verify("0000", $skipTempDiscount);
         return $payment->invoice;
 
     }

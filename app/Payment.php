@@ -35,23 +35,30 @@ class Payment extends Model
         return Payment::where('authority_code',$authorityCode )
             ->with(['user', 'invoice'])->first();
     }
-    public function verify($referenceId)
+    public function verify($referenceId, $skipTempDiscount = false)
     {
         $this->is_verified = true;
         $this->reference_id = $referenceId;
         $this->invoice->is_final = true;
         $this->invoice->is_pre_invoice = false;
+
         $this->save();
         $this->invoice->save();
+        //temp double discount
+        if(!$skipTempDiscount)
+        {
+            auth()->user()->deposit($this->amount, true);
+        }
+
         try{
             $this->user->notify(new PaymentConfirmed(strval($this->reference_id)));
         }
         catch(Exception $ex)
         {
-            
+
         }
 
-        
-    } 
+
+    }
 
 }
