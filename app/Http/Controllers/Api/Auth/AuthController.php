@@ -235,6 +235,48 @@ class AuthController extends Controller
         auth()->user()->save();
         return response()->json(['success' => true]);
     }
+    public function verifyAndLogin(Request $request)
+    {
+
+        $request->validate(['phone' => 'required', 'verification_code' => 'required']);
+        $user = User::where('phone', $request->input('phone'))->firstOrFail();
+        if ($user->verification_code == $request->input('verification_code')) {
+            $user->phone_verified_at = Carbon::now();
+            $saveResult = $user->save();
+            if ($saveResult) {
+
+                Affiliation::confirmAffiliation($user->id);
+                if (auth()->attempt([$user->phone, $user->password])) {
+
+
+
+                    $role = $user->checkRole();
+                    $scopes = '';
+                    // grant scopes based on the role that we get previously
+                    if ($role == 'service_user') {
+                        $scopes = config('scopes.service_user');
+                    } else if ($role == 'service_provider') {
+                        $scopes = config('scopes.service_provider');
+                    } else if ($role == 'admin') {
+                        $scopes = config('scopes.admin');
+                    }
+                    $request->request->add([
+                        'scope' => implode(' ', $scopes)
+                    ]);
+                    // forward the request to the oauth token request endpoint
+                    $tokenRequest = Request::create(
+                        '/oauth/token',
+                        'post'
+                    );
+                    //var_dump($request->all());die;
+                    return Route::dispatch($tokenRequest);
+                }
+                abort(400, "Inav");
+
+            }
+        }
+        abort(106, 'verification code invalid');
+    }
     public function login(Request $request)
     {
 

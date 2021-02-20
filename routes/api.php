@@ -22,6 +22,7 @@ Route::namespace('Api')->group(function () {
         Route::post('login', 'AuthController@login');
         Route::post('register', 'AuthController@register');
         Route::post('verify', 'AuthController@verify');
+        Route::post('verifyAndLogin', 'AuthController@verifyAndLogin');
         Route::post('requestVerificationCode', 'AuthController@requestVerificationCode');
         Route::post('requestVerificationCodePhoneOnly', 'AuthController@requestVerificationCodePhoneOnly');
         Route::post('userExists', 'AuthController@userExists');
