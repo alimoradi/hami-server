@@ -89,7 +89,7 @@ class AuthController extends Controller
         //$user->tinode_username = $request->input('tinode_username');
         //$user->tinode_pass = $request->input('tinode_pass');
         //$user->tinode_uid = $request->input('tinode_uid');
-        //$user->role_id = $this->accessManager->getRoleId('service_user');  
+        //$user->role_id = $this->accessManager->getRoleId('service_user');
         $saveResult = $user->save();
         if ($saveResult && $isProvider) {
             $provider = new Provider;
@@ -104,6 +104,29 @@ class AuthController extends Controller
 
 
         return response()->json(['success' => true]);
+    }
+    public function requestVerificationCodePhoneOnly(AccountVerifier $verifier, Request $request)
+    {
+        $request->validate(['phone' => 'required']);
+        $user = null;
+        try {
+            $user = User::where('phone', $request->input('phone'))
+                //->where('password', $request->input('password'))
+                ->firstOrFail();
+        } catch (Exception $e) {
+            $user = new User();
+            $user->phone_number = $request->input('phone');
+            $user->role_id = User::UNDECIDED_ROLE_ID;
+            $user->password =  rand(1000000,9999999);
+            $user->save();
+        }
+        $user->verification_code = $this->accountVerifier->generateVerificationCode();
+        if ($this->accountVerifier->sendVerificationCode($user->verification_code, $user->phone)) {
+            $user->phone_verified_at = null;
+            $user->save();
+            return response()->json(['success' => true], 200);
+        }
+        abort(400, 'verification code not sent');
     }
     public function requestVerificationCode(AccountVerifier $verifier, Request $request)
     {

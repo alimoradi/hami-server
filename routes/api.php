@@ -23,6 +23,9 @@ Route::namespace('Api')->group(function () {
         Route::post('register', 'AuthController@register');
         Route::post('verify', 'AuthController@verify');
         Route::post('requestVerificationCode', 'AuthController@requestVerificationCode');
+        Route::post('requestVerificationCodePhoneOnly', 'AuthController@requestVerificationCodePhoneOnly');
+        Route::post('userExists', 'AuthController@userExists');
+
         Route::post('requestVerificationCodeForPasswordRetrieval', 'AuthController@requestVerificationCodeForPasswordRetrieval');
         Route::post('retrievePassword', 'AuthController@retrievePassword');
         Route::post('postRegisterVerify', 'AuthController@postRegisterVerify');

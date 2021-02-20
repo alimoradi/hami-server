@@ -314,7 +314,7 @@ class User extends Authenticatable
     public const USER_ROLE_ID = 2;
     public const PROVIDER_ROLE_ID = 1;
     public const ADMIN_ROLE_ID = 3;
-
+    public const UNDECIDED_ROLE_ID = 4;
     public const AVATAR_THUMBNAIL_PREFIX = 'avatar_100_';
     public const  AVATAR_THUMBNAIL_WIDTH = 100;
 }
