@@ -105,6 +105,19 @@ class AuthController extends Controller
 
         return response()->json(['success' => true]);
     }
+    public function userExists( Request $request)
+    {
+        $request->validate(['phone' => 'required']);
+        $user = null;
+        try {
+            $user = User::where('phone', $request->input('phone'))
+                //->where('password', $request->input('password'))
+                ->firstOrFail();
+        } catch (Exception $e) {
+            return response()->json(['success' => false], 200);
+        }
+        return response()->json(['success' => true], 200);
+    }
     public function requestVerificationCodePhoneOnly(AccountVerifier $verifier, Request $request)
     {
         $request->validate(['phone' => 'required']);
