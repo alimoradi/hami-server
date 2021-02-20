@@ -134,7 +134,7 @@ class AuthController extends Controller
                 ->firstOrFail();
         } catch (Exception $e) {
             $user = new User();
-            $user->phone_number = $request->input('phone');
+            $user->phone = $request->input('phone');
             $user->role_id = User::UNDECIDED_ROLE_ID;
             $user->password =  rand(1000000,9999999);
             $user->save();
