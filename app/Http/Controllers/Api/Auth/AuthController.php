@@ -271,11 +271,13 @@ class AuthController extends Controller
                     //var_dump($request->all());die;
                     return Route::dispatch($tokenRequest);
                 }
-                abort(400, "Inav");
+                return response()->json(['error' => 'invalid data', 'error_code' => 110], 400);
+
 
             }
         }
-        abort(106, 'verification code invalid');
+        return response()->json(['error' => 'invalid data', 'error_code' => 106], 400);
+
     }
     public function login(Request $request)
     {
