@@ -83,8 +83,15 @@ class AuthController extends Controller
         }
 
         $user->phone = $request->input('phone');
-        $user->password = $request->input('password');
-
+        $pass = $request->input('password');
+        if($pass != "")
+        {
+            $user->password = $pass;
+        }
+        else
+        {
+            $user->password =  rand(1000000,9999999);
+        }
         $user->role_id = $roleId;
         //$user->tinode_username = $request->input('tinode_username');
         //$user->tinode_pass = $request->input('tinode_pass');
