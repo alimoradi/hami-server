@@ -249,7 +249,7 @@ class AuthController extends Controller
                 if (auth()->attempt(['phone' => $user->phone, 'password' => $user->password])) {
 
 
-
+                    $request->request->add(['password' =>$user->password ]);
                     $role = $user->checkRole();
                     $scopes = '';
                     // grant scopes based on the role that we get previously
