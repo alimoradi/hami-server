@@ -57,7 +57,6 @@ class AuthController extends Controller
     {
         $validations = [
             'phone' => 'required',
-            'password' => 'required',
             'role_id' => 'required'
         ];
         $roleId = $request->input('role_id');
