@@ -246,7 +246,7 @@ class AuthController extends Controller
             if ($saveResult) {
 
                 Affiliation::confirmAffiliation($user->id);
-                if (auth()->attempt([['phone' => $user->phone, 'password' => $user->password]])) {
+                if (auth()->attempt(['phone' => $user->phone, 'password' => $user->password])) {
 
 
 
