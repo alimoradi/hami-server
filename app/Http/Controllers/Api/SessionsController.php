@@ -86,7 +86,7 @@ class SessionsController extends Controller
         }
         else
         {
-            $session->invoice->amount = $session->finalCost();
+            $session->invoice->amount = $session->finalCost() * -1;
             $session->invoice->is_final = true;
             $session->invoice->is_pre_invoice = false;
 
