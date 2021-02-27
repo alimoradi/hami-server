@@ -120,6 +120,58 @@ class Session extends Model
         $this->user->unsubscribe($providerTopic->id);
         $this->provider->user->unsubscribe($userTopic->id);
     }
+    public function request($userId, $reservedFrom,$reservedTo, $providerId,
+        $chatTopicName, $duration, $type, $timingType)
+    {
+        $this->user_id = $userId;
+        $this->provider_id = $providerId;
+        $this->chat_topic_name = $chatTopicName;
+        $this->reserved_from = $reservedFrom;
+        $this->reserved_to = $reservedTo;
+        $this->type = $type;
+        $this->timing_type = $timingType;
+        if ($this->type == 1) {
+            $this->per_minute_fee = Provider::find($providerId)->per_minute_text_fee;
+        } else {
+            $this->per_minute_fee = Provider::find($providerId)->per_minute_call_fee;
+        }
+
+        $this->duration = $duration;
+        $invoice = $this->createInvoice();
+
+        $this->save();
+        $this->invoice()->save($invoice);
+
+
+    }
+    public function createInvoice()
+    {
+        $invoice = new Invoice();
+        $invoice->created_at = Carbon::now();
+        $invoice->is_final = false;
+        $invoice->is_pre_invoice = true;
+        $invoice->amount = $this->per_minute_fee * $this->duration * -1;
+        $invoice->user_id = auth()->user()->id;
+        $invoice->related_type =  1;
+        return $invoice;
+    }
+    public function finalCost()
+    {
+        $perMinuteFee = $this->per_minute_fee;
+        $seconds = 0;
+        if($this->type ==Session::SESSION_TYPE_TEXT )
+        {
+            $beginDate = Carbon::parse($this->started);
+            $endDate = Carbon::parse($this->ended);
+            $seconds = $endDate->diffInSeconds($beginDate);
+        }
+        else if($this->type ==Session::SESSION_TYPE_CALL)
+        {
+            $seconds = $this->used_seconds;
+        }
+        return floor($seconds / 60 * $perMinuteFee);
+
+    }
     public  const SESSION_TYPE_TEXT = 1;
     public  const SESSION_TYPE_CALL = 2;
     public  const SESSION_TIMING_TYPE_IMMEDIATE = 1;

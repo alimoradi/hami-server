@@ -29,32 +29,15 @@ class SessionsController extends Controller
         );
         $providerId = $request->input('provider_id');
         $session = new Session();
-        $session->user_id = auth()->user()->id;
-        $session->provider_id = $providerId;
-        $session->chat_topic_name = $request->input('chat_topic_name');
-        $session->reserved_from = Carbon::parse($request->input('reserved_from'));
-        $session->reserved_to = Carbon::parse($request->input('reserved_to'));
-        $session->type = $request->input('type');
-        $session->timing_type = $request->input('timing_type');
-        if ($session->type == 1) {
-            $session->per_minute_fee = Provider::find($providerId)->per_minute_text_fee;
-        } else {
-            $session->per_minute_fee = Provider::find($providerId)->per_minute_call_fee;
-        }
+        $session->request(auth()->user()->id,
+            Carbon::parse($request->input('reserved_from')),
+            Carbon::parse($request->input('reserved_to')),
+            $providerId,
+            $request->input('chat_topic_name'),
+            $request->input('duration'),
+            $request->input('type'),
+            $request->input('timing_type'));
 
-        $session->duration = $request->input('duration');
-
-
-        $invoice = new Invoice();
-        $invoice->created_at = Carbon::now();
-        $invoice->is_final = false;
-        $invoice->is_pre_invoice = true;
-        $invoice->amount = $session->per_minute_fee * $session->duration * -1;
-        $invoice->user_id = auth()->user()->id;
-        $invoice->related_type =  1;
-
-        $session->save();
-        $session->invoice()->save($invoice);
         //return response()->json($invoice);
         //$session->save();
         //$session->push();
@@ -88,9 +71,7 @@ class SessionsController extends Controller
         $session = Session::find($sessionId);
         $session->ended = Carbon::now();
         $session->save();
-        $session = Session::find($sessionId);
-        //$session->started = Carbon::now();
-        $session->save();
+
         if (Session::where('provider_id', $session->provider->id)
             ->where('user_id', $session->user->id)
             ->where('accepted', '!=', null)
@@ -101,6 +82,14 @@ class SessionsController extends Controller
         }
         if ($session->started == null) {
             $session->invoice->deleted = true;
+            $session->invoice->save();
+        }
+        else
+        {
+            $session->invoice->amount = $session->finalCost();
+            $session->invoice->is_final = true;
+            $session->invoice->is_pre_invoice = false;
+
             $session->invoice->save();
         }
         return Session::with(['provider', 'provider.user', 'user', 'provider.providerCategories'])->find($session->id);

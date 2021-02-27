@@ -35,6 +35,10 @@ class SessionReferral extends Model
         $this->surveyed_at = Carbon::now();
         $this->surveyor_id = $surveyorId;
         $this->save();
+        $this->session->invoice->amount = $this->session->finalCost();
+        $this->session->invoice->is_final = true;
+        $this->session->invoice->is_pre_invoice = false;
+        $this->session->invoice->save();
         $this->session->user->notify(new ReferralResult($this->session));
         return $this;
     }
@@ -44,6 +48,8 @@ class SessionReferral extends Model
         $this->surveyed_at = Carbon::now();
         $this->surveyor_id = $surveyorId;
         $this->save();
+        $this->session->invoice->deleted = true;
+        $this->session->invoice->save();
         $this->session->user->notify(new ReferralResult($this->session));
         return $this;
     }
