@@ -48,7 +48,7 @@
                                 </p>
                             @endif
 
-                          <a href="http://app.hamiline.ir/open" class="btn btn-primary">بازگشت به حامی لاین</a>
+                          <a href="hamiline://launch" class="btn btn-primary">بازگشت به حامی لاین</a>
                         </div>
                       </div>
                 </div>
