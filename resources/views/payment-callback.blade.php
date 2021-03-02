@@ -13,6 +13,7 @@
     <style>
         body{
             font-family: iransans;
+            direction:rtl;
         }
         .gree{
             color:green;

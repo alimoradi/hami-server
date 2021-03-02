@@ -30,8 +30,7 @@ class HomeController extends Controller
     }
     public function paymentCallback()
     {
-        $success = false;
-        $refId = "430434385";
+       
         $MerchantID = 'abc437bf-29c0-4580-b4d7-618b4eff3a70';
         try{
             $Authority = $_GET['Authority'];
