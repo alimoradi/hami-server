@@ -294,7 +294,7 @@ class UsersController extends Controller
         $Mobile = auth()->user()->phone;
 
         //$CallbackURL = 'http://193.141.64.116:81/api/payment/paymentCallback'; // Required
-        $CallbackURL = env('ZARINPAL_CALLBACK_URL', 'http://193.141.64.116:81/api/payment/paymentCallback');
+        $CallbackURL = env('ZARINPAL_CALLBACK_URL', 'http://193.141.64.116:80/api/payment/paymentCallback');
         $client = new SoapClient('https://www.zarinpal.com/pg/services/WebGate/wsdl', ['encoding' => 'UTF-8']);
         $result = $client->PaymentRequest(
             [

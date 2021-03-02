@@ -14,6 +14,8 @@
 Route::get('/', function () {
     return view('welcome');
 });
+Route::get('/paymentCallback', 'HomeController@paymentCallback');
+
 Auth::routes();
 
 Auth::routes();
