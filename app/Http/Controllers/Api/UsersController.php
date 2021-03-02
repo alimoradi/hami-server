@@ -293,7 +293,7 @@ class UsersController extends Controller
         $Description = 'افزایش اعتبار'; // Required
         $Mobile = auth()->user()->phone;
 
-        $CallbackURL = env('ZARINPAL_CALLBACK_URL', 'https://hamiline.alimoradics.ir/paymentCallback');
+        $CallbackURL = 'https://hamiline.alimoradics.ir/paymentCallback';
         $client = new SoapClient('https://www.zarinpal.com/pg/services/WebGate/wsdl', ['encoding' => 'UTF-8']);
         $result = $client->PaymentRequest(
             [
