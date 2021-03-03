@@ -47,7 +47,7 @@ class Payment extends Model
         //temp double discount
         if(!$skipTempDiscount)
         {
-            auth()->user()->deposit($this->amount, true);
+            $this->user->deposit($this->amount, true);
         }
 
         try{
