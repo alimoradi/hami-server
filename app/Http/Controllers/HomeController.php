@@ -30,7 +30,7 @@ class HomeController extends Controller
     }
     public function paymentCallback()
     {
-       
+
         $MerchantID = 'abc437bf-29c0-4580-b4d7-618b4eff3a70';
         try{
             $Authority = $_GET['Authority'];
@@ -55,13 +55,17 @@ class HomeController extends Controller
                     return view('payment-callback')->with(['success' => false, 'refId'=> null]);
                 }
             }
+            else
+            {
+                return view('payment-callback')->with(['success' => false, 'refId'=> null]);
+            }
         }
         catch(Exception $ex)
         {
-            
+
                     return view('payment-callback')->with(['success' => false, 'refId'=> null]);
         }
-        
-        
+
+
     }
 }
