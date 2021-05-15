@@ -12,11 +12,17 @@ class PublicQuestionAndAnswersController extends Controller
 {
     public function getAllQuestions()
     {
-        return PublicQuestionAndAnswers::where('question_id', null)
-        ->orderBy('created_at', 'DESC')->get();
-        
+        $query = PublicQuestionAndAnswers::where('question_id', null)
+        ->orderBy('created_at', 'DESC');
+        //var_dump(auth()->user()->role_id);
+        if(!auth()->user() || auth()->user()->role_id != User::ADMIN_ROLE_ID )
+        {
+            $query = $query->where('confirmed', true);
+        }
+        return $query->get();
+
     }
-    
+
     public function getAnswers($questionId)
     {
         return PublicQuestionAndAnswers::with([ 'answers.user','answers'])->find($questionId);
@@ -64,7 +70,16 @@ class PublicQuestionAndAnswersController extends Controller
         $answer->content = $request->input('content');
         $answer->user_id = auth()->user()->id;
         $answer->question_id = $request->input('question_id');
+        $answer->confirmed = true;
         $answer->save();
         return response()->json(['success'=> true]);
     }
+    public function toggleConfirm($questionId)
+    {
+        $question = PublicQuestionAndAnswers::find($questionId);
+        $question->confirmed = !$question->confirmed;
+        $question->save();
+        return $question;
+    }
+
 }
