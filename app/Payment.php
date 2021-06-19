@@ -45,10 +45,10 @@ class Payment extends Model
         $this->save();
         $this->invoice->save();
         //temp double discount
-        if(!$skipTempDiscount)
-        {
-            $this->user->deposit($this->amount, true);
-        }
+        // if(!$skipTempDiscount)
+        // {
+        //     $this->user->deposit($this->amount, true);
+        // }
 
         try{
             $this->user->notify(new PaymentConfirmed(strval($this->reference_id)));
