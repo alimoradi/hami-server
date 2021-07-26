@@ -103,6 +103,7 @@ Route::namespace('Api')->group(function () {
         Route::get('user', 'UsersController@me');
         Route::get('getPeers', 'UsersController@getPeers');
         Route::post('makeCall', 'UsersController@makeCall');
+        Route::post('requestPeerCall', 'UsersController@requestPeerCall');
         Route::post('callEnded', 'UsersController@callEnded');
         Route::post('callStarted', 'UsersController@callStarted');
         Route::get('getDiscounts', 'UsersController@getDiscounts');

@@ -20,6 +20,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use SoapClient;
+use Illuminate\Support\Str;
 
 class UsersController extends Controller
 {
@@ -228,6 +229,39 @@ class UsersController extends Controller
                 , $maxDuration);
             return response()->json(['id' => $callId,'sessionId'=> $sessionId, 'maxDuration'=> $maxDuration,  'access_token' => $callerAccessToken]);
         }
+        return response()->json('', 404);
+    }
+    public function requestPeerCall(Request $request)
+    {
+        $request->validate(
+            [
+                'caller_peer_id'=>'required',
+                'receptor_user_id' => 'required',
+                'session_id' => 'required',
+
+            ]
+        );
+        $callerUsername = auth()->user()->phone;
+        $receptor = User::find($request->input('receptor_user_id'));
+        $receptorUsername = $receptor->phone;
+        $sessionId = $request->input('session_id');
+        $maxDuration = SessionCall::calculateMaxDuration($sessionId);
+
+
+        
+            $callId = Str::uuid();
+            $callerAccessToken = 'NA';
+            $receptorAccessToken = $request->input('caller_peer_id');
+            $receptor->notify(new IncomingCall($receptorAccessToken, $callId, json_encode(auth()->user()), strval($maxDuration), strval($sessionId)));
+            SessionCall::saveCall($callId
+                , auth()->user()->id
+                , $receptor->id
+                , $sessionId
+                , $callerAccessToken
+                , $receptorAccessToken
+                , $maxDuration);
+            return response()->json(['id' => $callId,'sessionId'=> $sessionId, 'maxDuration'=> $maxDuration,  'access_token' => $callerAccessToken]);
+        
         return response()->json('', 404);
     }
     public function callStarted(Request $request)
