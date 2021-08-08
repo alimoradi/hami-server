@@ -14,6 +14,7 @@ class ChangeCodeInDiscounts extends Migration
     public function up()
     {
         Schema::table('discounts', function (Blueprint $table) {
+            $table->dropUnique('discounts_code_unique');
             $table->string('code',255)->change();
 
         });
