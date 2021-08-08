@@ -29,10 +29,10 @@ class Discount extends Model
 
     }
     public static function redeemDiscount($userId, $code){
-        $code = DiscountCode::where('code', $code)->first();
+        $code = DiscountCode::whereRaw("BINARY `code`= ?",[$code])->first();
         if($code)
         {
-            if(Discount::where('code', $code->code)->where('user_id', $userId)->count() > 0)
+            if(Discount::whereRaw("BINARY `code`= ?",[$code->code])->where('user_id', $userId)->count() > 0)
             {
                 return false;
             }
