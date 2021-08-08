@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\AdditionalInfo;
+use App\Discount;
 use App\Libraries\Notifications\MessageReceived;
 use App\Http\Controllers\Controller;
 use App\Interfaces\VoiceCallMaker;
@@ -248,7 +249,7 @@ class UsersController extends Controller
         $maxDuration = SessionCall::calculateMaxDuration($sessionId);
 
 
-        
+
             $callId = Str::uuid();
             $callerAccessToken = 'NA';
             $receptorAccessToken = $request->input('caller_peer_id');
@@ -261,7 +262,7 @@ class UsersController extends Controller
                 , $receptorAccessToken
                 , $maxDuration);
             return response()->json(['id' => $callId,'sessionId'=> $sessionId, 'maxDuration'=> $maxDuration,  'access_token' => $callerAccessToken]);
-        
+
         return response()->json('', 404);
     }
     public function callStarted(Request $request)
@@ -343,6 +344,22 @@ class UsersController extends Controller
             return response()->json(['authority_code' => $result->Authority]);
         }
         return response()->json(['error' => 'payment authority failed', 'error_code' => 109], 400);
+    }
+    public function redeemDiscount(Request $request)
+    {
+        $request->validate(
+            [
+                'discount_code' => 'required',
+            ]
+        );
+        if(Discount::redeemDiscount(auth()->user()->id, $request->input('discount_code')))
+        {
+            return response()->json(['success' => true]);
+
+        }
+        return response()->json(['error' => 'invalid discount code', 'error_code' => 111], 404);
+
+
     }
     public function paymentCallback()
     {

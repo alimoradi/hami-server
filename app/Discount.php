@@ -11,15 +11,35 @@ class Discount extends Model
          Discount::createAndSaveDiscountForUser($firstUserId,15000);
          Discount::createAndSaveDiscountForUser($secondUserId, 15000);
     }
-    public static function createAndSaveDiscountForUser($userId, $value)
+    public static function createAndSaveDiscountForUser($userId, $value, $code = null)
     {
         $discount = new Discount();
         $discount->value = $value;
         $discount->activated = true;
         $discount->user_id = $userId;
-        $discount->code = Discount::generateDiscountCode();
+        if($code == null)
+        {
+            $discount->code = Discount::generateDiscountCode();
+        }
+        else
+        {
+            $discount->code = $code;
+        }
         $discount->save();
 
+    }
+    public static function redeemDiscount($userId, $code){
+        $code = DiscountCode::where('code', $code)->first();
+        if($code)
+        {
+            if(Discount::where('code', $code->code)->where('user_id', $userId)->count() > 0)
+            {
+                return false;
+            }
+            Discount::createAndSaveDiscountForUser($userId, $code->value, $code->code);
+            return true;
+        }
+        return false;
     }
     public static function generateDiscountCode()
     {
@@ -29,7 +49,7 @@ class Discount extends Model
             return Discount::generateDiscountCode();
         }
         return $random;
-         
+
     }
 
 }

@@ -108,6 +108,7 @@ Route::namespace('Api')->group(function () {
         Route::post('callStarted', 'UsersController@callStarted');
         Route::get('getDiscounts', 'UsersController@getDiscounts');
         Route::post('useDiscount/{discountId}', 'UsersController@useDiscount');
+        Route::post('redeemDiscount', 'UsersController@redeemDiscount');
     });
     Route::get('stats', 'UsersController@stats');
     Route::get('config', 'UsersController@config');
@@ -139,7 +140,7 @@ Route::namespace('Api')->group(function () {
        Route::middleware('auth:api')->group(function () {
             Route::get('getMyQuestions', 'PublicQuestionAndAnswersController@getMyQuestions');
             Route::get('getAllQuestions', 'PublicQuestionAndAnswersController@getAllQuestions');
-            Route::get('getAnswers/{questionId}', 'PublicQuestionAndAnswersController@getAnswers');    
+            Route::get('getAnswers/{questionId}', 'PublicQuestionAndAnswersController@getAnswers');
             Route::post('toglleConfirm/{questionId}', 'PublicQuestionAndAnswersController@toggleConfirm');
             Route::post('ask', 'PublicQuestionAndAnswersController@ask');
             Route::post('answer', 'PublicQuestionAndAnswersController@answer');
