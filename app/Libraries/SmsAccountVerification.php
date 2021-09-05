@@ -13,10 +13,10 @@ class SmsAccountVerification implements AccountVerifier
     }
     public function sendVerificationCode($verificationCode, $phoneNumber)
     {
-        $apiKey = "4A7674346D57477642546549686457495334474735526F45573774714A596C3444745A744B564D59496E553D";
+        $apiKey = "79506870774B67524E73707245617652586B6B59314841465151426F626D616E4877503879567A76412F343D";
         $url = "https://api.kavenegar.com/v1/$apiKey/verify/lookup.json";
         $tokenString = "token=$verificationCode";
-        $templateString="template=hami";
+        $templateString="template=verify";
         $receptorString="receptor=$phoneNumber";
         $url = "$url?$tokenString&$templateString&$receptorString";
         $client = new Client();
