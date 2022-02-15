@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Discount extends Model
 {
@@ -26,8 +27,24 @@ class Discount extends Model
             $discount->code = $code;
         }
         $discount->save();
+		return $discount;
 
     }
+	public static function useDiscount($user, $discountId)
+	{
+		$discount = $user->discounts()
+            ->where('id', $discountId)
+            ->where('activated', true)
+            ->where('expired', false)->first();
+        if ($discount) {
+            $invoice = $user->deposit($discount->value);
+            $discount->expired = true;
+            $discount->expired_at = Carbon::now();
+            $discount->save();
+           	return $invoice;
+        }
+		return false;
+	}	
     public static function redeemDiscount($userId, $code){
         $code = DiscountCode::whereRaw("BINARY `code`= ?",[$code])->first();
         if($code)

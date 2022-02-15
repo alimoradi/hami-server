@@ -14,3 +14,4 @@ yarn-error.log
 /storage
 docker-compose.yml
 nginx/conf.d/app.conf
+.idea
