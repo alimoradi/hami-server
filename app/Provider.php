@@ -57,7 +57,9 @@ class Provider extends Model
         if ($this->ended_sessions_count > 0) {
             $scores = $this->sessions()
                 ->where('started', "!=", null)
-                ->where('ended', "!=", null)->pluck('score')->toArray();
+                ->where('ended', "!=", null)
+                ->where('score', "!=", null)
+                ->pluck('score')->toArray();
             $sum = 0;
             foreach ($scores as $score) {
                 $sum += $score;
@@ -76,7 +78,7 @@ class Provider extends Model
     public  const EDUCATION_DEGREE_BACHELORS = 2;
     public  const EDUCATION_DEGREE_MASTERS = 3;
     public  const EDUCATION_DEGREE_PHD = 4;
-    
+
     public  const PROVIDER_STATS_ONLINE_COUNT = 1;
     public  const PROVIDER_STATS_IN_SESSION_COUNT = 2;
     public  const PROVIDER_STATS_TOTAL_COUNT = 3;
