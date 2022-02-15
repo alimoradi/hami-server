@@ -212,15 +212,21 @@ class UsersController extends Controller
         $receptor = User::find($request->input('receptor_user_id'));
         $receptorUsername = $receptor->phone;
         $sessionId = $request->input('session_id');
+
+		$call = SessionCall::getCall($sessionId);
+        if ($call) {
+            return response()->json(['id' => $call->id,'sessionId'=> $call->session_id, 'maxDuration'=> $call->max_duration,  'access_token' => $call->caller_access_token]);
+        }
         $maxDuration = SessionCall::calculateMaxDuration($sessionId);
-        $call = $callMaker->createCall($callerUsername, $receptorUsername, $maxDuration);
+        $call = $callMaker->createCall($callerUsername, $receptorUsername, $maxDuration/10);
 
 
         if ($call) {
-            $callId = $call->id;
-            $callerAccessToken = $call->caller->accessToken;
-            $receptorAccessToken = $call->receptor->accessToken;;
-            $receptor->notify(new IncomingCall($receptorAccessToken, $callId, json_encode(auth()->user()), strval($maxDuration), strval($sessionId)));
+            $callId = strval(rand(10000000000,99999999999));
+            $callerAccessToken = $call->output;
+            $receptorAccessToken = $call->output;
+            //var_dump($call);
+            //$receptor->notify(new IncomingCall($receptorAccessToken, $callId, json_encode(auth()->user()), strval($maxDuration), strval($sessionId)));
             SessionCall::saveCall($callId
                 , auth()->user()->id
                 , $receptor->id
@@ -303,19 +309,12 @@ class UsersController extends Controller
     }
     public function useDiscount(Request $request, $discountId)
     {
-
-        $discount = auth()->user()->discounts()
-            ->where('id', $discountId)
-            ->where('activated', true)
-            ->where('expired', false)->first();
-        if ($discount) {
-            $invoice = auth()->user()->deposit($discount->value);
-            $discount->expired = true;
-            $discount->expired_at = Carbon::now();
-            $discount->save();
-            return response()->json($invoice);
-        }
-        return response()->json('', 404);
+		$invoice = Discount::useDiscount(auth()->user(), $discountId);
+		if($invoice)
+		{
+			return response()->json($invoice);
+		}
+		return response()->json('', 404);
     }
     public function getAll()
     {

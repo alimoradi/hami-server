@@ -18,6 +18,10 @@ class Session extends Model
     {
         return $this->belongsTo(Provider::class);
     }
+	public function sessionCall()
+    {
+        return $this->hasOne(SessionCall::class);
+    }
     public function getReferralStatusAttribute()
     {
         if(!$this->referral)

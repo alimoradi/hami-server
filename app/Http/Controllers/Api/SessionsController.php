@@ -11,6 +11,8 @@ use App\Topic;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Interfaces\VoiceCallMaker;
+use App\SessionCall;
 
 class SessionsController extends Controller
 {
@@ -51,7 +53,7 @@ class SessionsController extends Controller
         $session->subscribeToEachOther();
         return Session::with(['provider', 'provider.user', 'user', 'provider.providerCategories'])->find($session->id);
     }
-    public function start($sessionId)
+    public function start($sessionId, VoiceCallMaker $callMaker)
     {
         $session = Session::find($sessionId);
         $session->started = Carbon::now();
@@ -64,7 +66,12 @@ class SessionsController extends Controller
         ) {
             $session->unsubscribeFromEachOther();
         }
-        return Session::with(['provider', 'provider.user', 'user', 'provider.providerCategories'])->find($session->id);
+		if($session->type == Session::SESSION_TYPE_CALL && !SessionCall::getCall($sessionId))
+		{
+			SessionCall::createCall($session, $callMaker);
+		}
+		SessionCall::createCall($session, $callMaker);
+        return Session::with(['provider', 'provider.user', 'user', 'provider.providerCategories', 'sessionCall'])->find($session->id);
     }
     public function end($sessionId)
     {
@@ -97,7 +104,7 @@ class SessionsController extends Controller
     public function providerActiveSessions()
     {
 
-        return Session::with(['provider', 'provider.user', 'user', 'provider.providerCategories'])
+        return Session::with(['provider', 'provider.user', 'user', 'provider.providerCategories', 'sessionCall'])
             ->whereHas('provider.user', function ($query) {
                 $query->where('id', '=', auth()->user()->id);
             })
@@ -117,7 +124,8 @@ class SessionsController extends Controller
     }
     public function getSessions()
     {
-        return auth()->user()->sessions;
+		return auth()->user()->sessions;
+        
     }
     public function getUserSessions($userId)
     {
@@ -295,7 +303,7 @@ class SessionsController extends Controller
     }
     public function userRequestedSessions()
     {
-        return Session::with(['provider', 'provider.user', 'user', 'provider.providerCategories'])
+        return Session::with(['provider', 'provider.user', 'user', 'provider.providerCategories', 'sessionCall'])
             ->where('user_id', auth()->user()->id)
             ->where('started', null)
             ->orderBy('started', 'DESC')
@@ -327,7 +335,7 @@ class SessionsController extends Controller
     }
     public function getById($sessionId)
     {
-        return Session::find($sessionId)->with(['provider', 'provider.user', 'user', 'provider.providerCategories', 'referral'])->find($sessionId);
+        return Session::find($sessionId)->with(['provider', 'provider.user', 'user', 'provider.providerCategories', 'referral', 'sessionCall'])->find($sessionId);
     }
     public function getSessionsState(Request $request)
     {

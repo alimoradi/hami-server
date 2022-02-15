@@ -20,6 +20,27 @@ class SessionCall extends Model
         return $sessionDuration - $pastDuration;
 
     }
+	public static function createCall($session, $callMaker) {
+		$maxDuration = $session->duration;
+        $call = $callMaker->createCall($session->user->phone, $session->provider->user->id, $maxDuration);
+		if ($call) {
+            $callId = strval(rand(10000000000,99999999999));
+            $callerAccessToken = $call->output;
+            $receptorAccessToken = $call->output;
+            SessionCall::saveCall($callId
+                , $session->user->id
+                , $session->provider->user_id
+                , $session->id
+                , $callerAccessToken
+                , $receptorAccessToken
+                , $maxDuration);
+            return true;
+        }
+		return false;
+	}
+	public static function getCall($sessionId) {
+		return SessionCall::where('session_id', $sessionId)->first();
+	}
     public function getDurationAttribute()
     {
         $beginDate = Carbon::parse($this->started_at);

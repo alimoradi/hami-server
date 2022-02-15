@@ -6,7 +6,7 @@ use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvid
 use Illuminate\Support\Facades\Gate;
 use Laravel\Passport\Passport;
 use App\Libraries\AccessManagerService;
-use App\Libraries\KavenegarVoiceCall;
+use App\Libraries\BlueRoomVoiceCall;
 use App\Libraries\SmsAccountVerification;
 
 class AuthServiceProvider extends ServiceProvider
@@ -25,7 +25,7 @@ class AuthServiceProvider extends ServiceProvider
             return new SmsAccountVerification();
         });
         $this->app->bind('App\Interfaces\VoiceCallMaker', function($app){
-            return new KavenegarVoiceCall();
+            return new BlueRoomVoiceCall();
         });
 
         $this->app->bind('App\Interfaces\UserAccessManager', function($app){

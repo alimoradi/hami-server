@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Http\Request;
 use App\User;
+use App\Discount;
 use Illuminate\Support\Facades\Route;
 use App\Interfaces\AccountVerifier;
 use App\Interfaces\UserAccessManager;
@@ -57,8 +58,10 @@ class AuthController extends Controller
     {
         $validations = [
             'phone' => 'required',
+			'country_code' => 'required',
             'role_id' => 'required'
         ];
+		$phoneNumber = $request->input('country_code') . substr($request->input('phone'), 1, strlen($request->input('phone'))-1);
         $roleId = $request->input('role_id');
         $isProvider = $roleId == $this->accessManager->getRoleId('service_provider');
         if ($isProvider) {
@@ -71,7 +74,7 @@ class AuthController extends Controller
         } catch (Exception $x) {
             return response()->json(['error' => 'invalid data', 'error_code' => 108], 400);
         }
-        $user = User::where('phone', $request->input('phone'))->first();
+        $user = User::where('phone', $phoneNumber)->first();
         if ($user) {
             return response()->json(['error' => 'user already exists', 'error_code' => 107], 400);
         }
@@ -81,7 +84,7 @@ class AuthController extends Controller
             $user->last_name = $request->input('last_name');
         }
 
-        $user->phone = $request->input('phone');
+        $user->phone = $phoneNumber;
         $pass = $request->input('password');
         if($pass != "")
         {
@@ -104,8 +107,13 @@ class AuthController extends Controller
             $user->provider()->save($provider);
         }
         $affiliateCode = $request->input('affiliate_code');
-        if ($saveResult && !$isProvider && $affiliateCode) {
-            Affiliation::createAffiliation($user->id, $affiliateCode);
+        if ($saveResult && !$isProvider) {
+			if($affiliateCode)
+			{
+				Affiliation::createAffiliation($user->id, $affiliateCode);
+			}
+           
+			Discount::createAndSaveDiscountForUser($user->id, 15000);
         }
 
 
@@ -113,10 +121,11 @@ class AuthController extends Controller
     }
     public function userExists( Request $request)
     {
-        $request->validate(['phone' => 'required']);
+        $request->validate(['phone' => 'required', 'country_code' => 'required']);
         $user = null;
+		$phoneNumber = $request->input('country_code') . substr($request->input('phone'), 1, strlen($request->input('phone'))-1);
         try {
-            $user = User::where('phone', $request->input('phone'))
+            $user = User::where('phone', $phoneNumber)
                 //->where('password', $request->input('password'))
                 ->firstOrFail();
         } catch (Exception $e) {
@@ -126,15 +135,16 @@ class AuthController extends Controller
     }
     public function requestVerificationCodePhoneOnly(AccountVerifier $verifier, Request $request)
     {
-        $request->validate(['phone' => 'required']);
+        $request->validate(['phone' => 'required', 'country_code' => 'required']);
+		$phoneNumber = $request->input('country_code') . substr($request->input('phone'), 1, strlen($request->input('phone'))-1);
         $user = null;
         try {
-            $user = User::where('phone', $request->input('phone'))
+            $user = User::where('phone', $phoneNumber)
                 //->where('password', $request->input('password'))
                 ->firstOrFail();
         } catch (Exception $e) {
             $user = new User();
-            $user->phone = $request->input('phone');
+            $user->phone = $phoneNumber;
             $user->role_id = User::UNDECIDED_ROLE_ID;
             $user->password =  rand(1000000,9999999);
             $user->save();
@@ -238,8 +248,10 @@ class AuthController extends Controller
     public function verifyAndLogin(Request $request)
     {
 
-        $request->validate(['phone' => 'required', 'verification_code' => 'required']);
-        $user = User::where('phone', $request->input('phone'))->firstOrFail();
+        $request->validate(['phone' => 'required', 'country_code' => 'required', 'verification_code' => 'required']);
+		$phoneNumber = $request->input('country_code') . substr($request->input('phone'), 1, strlen($request->input('phone'))-1);
+
+        $user = User::where('phone', $phoneNumber)->firstOrFail();
         if ($user->verification_code == $request->input('verification_code')) {
             $user->phone_verified_at = Carbon::now();
             $saveResult = $user->save();
