@@ -55,16 +55,11 @@ class Provider extends Model
     {
         $mean = 0;
         if ($this->ended_sessions_count > 0) {
-            $scores = $this->sessions()
+            $mean = $this->sessions()
                 ->where('started', "!=", null)
                 ->where('ended', "!=", null)
                 ->where('score', "!=", null)
-                ->pluck('score')->toArray();
-            $sum = 0;
-            foreach ($scores as $score) {
-                $sum += $score;
-            }
-            $mean = $sum / $this->ended_sessions_count;
+                ->avg('score');
         }
 
         return $mean;
