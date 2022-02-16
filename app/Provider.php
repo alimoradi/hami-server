@@ -55,11 +55,11 @@ class Provider extends Model
     {
         $mean = 0;
         if ($this->ended_sessions_count > 0) {
-            $mean = $this->sessions()
+            $mean = intval($this->sessions()
                 ->where('started', "!=", null)
                 ->where('ended', "!=", null)
                 ->where('score', "!=", null)
-                ->avg('score');
+                ->avg('score'));
         }
 
         return $mean;
