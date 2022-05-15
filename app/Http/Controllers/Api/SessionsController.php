@@ -101,6 +101,13 @@ class SessionsController extends Controller
         }
         return Session::with(['provider', 'provider.user', 'user', 'provider.providerCategories'])->find($session->id);
     }
+	public function hide($sessionId)
+    {
+        $session = Session::find($sessionId);
+        $session->hidden = true;
+        $session->save();
+        return Session::with(['provider', 'provider.user', 'user', 'provider.providerCategories'])->find($session->id);
+    }
     public function providerActiveSessions()
     {
 
